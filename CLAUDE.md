@@ -73,3 +73,8 @@ prose it is `MyPreflight`, one word. The two are not interchangeable.
   self-explanatory through clear names and structure; refactor instead of commenting.
 - All user-facing copy is **English**.
 - URLs and site copy constants live in `src/constants.ts`, not inline.
+- **Use Tailwind's scale, never arbitrary values.** No `text-[0.6875rem]`, `max-w-[46ch]`,
+  `h-[22px]`: pick the nearest scale step (`text-xs`, `max-w-sm`, `size-5`). If a value truly has
+  no scale equivalent, add a token to `@theme` in `src/styles/global.css` instead. The one
+  exception is the navbar theme-toggle icon, whose `h-[22px] w-[22px]` mirrors `<Icon size={22} />`
+  in the app's `LandingNavbar.tsx`.

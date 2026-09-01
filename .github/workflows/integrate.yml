@@ -5,16 +5,21 @@ on:
     paths: ["**", "!**.md"]
 
 jobs:
-  version:
+  files:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v7
+      - name: "Checkout repository"
+        uses: "actions/checkout@v7"
         with:
           fetch-depth: 0
-      - name: Check if version is available to publish
-        run: './.github/bin/check_version_is_free "$(jq -r ''.version'' package.json)"'
-        continue-on-error: true
+      - name: "Check for CRLF line endings"
+        uses: gi-org-pl/check-crlf-action@v1
+      - name: "Check for file permission changes"
+        uses: gi-org-pl/check-file-permissions-action@v1
+      - name: "Check app version is unique"
+        uses: gi-org-pl/check-version-action@v1
+        with:
+          version: "$(jq -r '.version' package.json)"
   code:
     runs-on: ubuntu-latest
     steps:

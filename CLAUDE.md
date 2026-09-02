@@ -6,7 +6,11 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 Public marketing site for MyPreflight, the electronic flight board for flight simulation. The
 application itself lives in a separate repository (`flight-tracker-app`); this repo is the landing
-site only. It is a single marketing page at `/`, still flagged as in-preparation in the hero.
+site only. The product is flagged as in development in the hero, with launch scheduled for late
+2026.
+
+Routes: the marketing page at `/`, a `404`, and two generated text routes covered under
+"Machine-readable copies" below. There is no other page.
 
 - **Framework**: Astro 7, static output, **no UI framework** — no React, no islands. Interactivity
   is plain `<script>` in `.astro` files. Keep it that way unless the user explicitly asks otherwise.
@@ -81,14 +85,69 @@ as claims in full sentences, not as feature nouns.
 Repeating copy — features, steps, FAQ — lives as typed `as const` arrays in `src/constants.ts` and
 is mapped over in the template.
 
-Product screenshots do not exist yet. `VisualSlot.astro` reserves the space with a fixed-ratio
-frame and takes an optional `src`; swapping a real image of the same ratio in causes no layout
-shift. Never fill a slot with fabricated product UI or invented numbers.
+Each feature section carries a real screenshot of the app, in `public/screenshots/` as 1920x1080
+AVIF, one file per theme. `VisualSlot.astro` takes `src` and `srcDark` and renders both behind
+`dark:hidden` / `hidden dark:block`, with `loading="lazy"` so only the active theme is fetched, and
+`width`/`height` so the 16:9 box is reserved before load. Paths and alt text live on each entry in
+`FEATURES`.
+
+The shots are **component crops, not full app views**: at the 544px the slot renders on desktop a
+whole screen is illegible. They were captured by building a fixed 960x540 stage inside the running
+app at `deviceScaleFactor: 2`, cloning the chosen panels into it, and sizing the content to fill
+16:9 exactly. Reproduce that framing if you replace one.
+
+Never fill a slot with fabricated product UI or invented numbers. Where the seeded dev data made a
+panel read as broken, the fix was to correct the fixture and let the app render it, never to edit
+the rendered value.
 
 Scroll reveal is deliberately fail-open. The inline head script sets `data-reveal="on"` on
 `<html>`, and `.rise` is hidden **only** under that attribute, so if JavaScript never runs nothing
 is ever hidden. A single `IntersectionObserver` in `Layout.astro` adds `.is-visible` once per
 element. Do not invert this to a plain `opacity: 0` default.
+
+## Fonts
+
+Noto Sans is **self-hosted**, not loaded from Google. Two variable woff2 subsets live in
+`public/fonts/` with the `@font-face` rules at the top of `src/styles/global.css`, declared
+`font-weight: 400 700` against the variable axis. Only weights 400 and 700 are used anywhere, so
+do not reintroduce 600.
+
+Both faces carry Google's original `unicode-range` values, which is what keeps the 164KB
+`latin-ext` file from ever being fetched for English copy while still covering Polish diacritics
+the moment they appear. The `latin` file is preloaded in `Layout.astro`; `latin-ext` deliberately
+is not.
+
+The font is redistributed under the SIL Open Font License, so `public/fonts/OFL.txt` must ship
+alongside it. Do not swap in a system font stack: the app sets `--font-sans: "Noto Sans"` and the
+two must match.
+
+## SEO and metadata
+
+`Layout.astro` owns the whole head. It takes `title`, `description` and an optional `robots`
+(defaulting to indexable; the 404 passes `noindex, follow`). Alongside the usual canonical and
+favicons it emits Open Graph and Twitter cards, and two JSON-LD blocks: a `SoftwareApplication`
+built from the constants, and a `FAQPage` generated from `FAQ.items`, so the FAQ answers stay the
+single source for both the page and the structured data.
+
+`public/og.png` is the 1200x630 social card. Its dimensions are declared in the `OG_IMAGE` constant
+and **must match the file**, or scrapers letterbox it. It was rendered from a temporary Astro page
+using the real tokens, wordmark and a product screenshot, then deleted; rebuild it the same way
+rather than hand-drawing one. Social platforms cache aggressively, so after changing it, re-scrape
+through the Facebook Sharing Debugger and LinkedIn Post Inspector.
+
+`SITE_TITLE` and `SITE_DESCRIPTION` live in `src/constants.ts`, not inline in the page.
+
+## Machine-readable copies
+
+`/llms.txt` and `/index.html.md` follow [llmstxt.org](https://llmstxt.org/). Both are Astro
+endpoints (`src/pages/llms.txt.ts`, `src/pages/index.html.md.ts`) generated **from the same
+constants as the page**, so copy changes propagate automatically. Never hand-edit them into static
+files in `public/`.
+
+`llms.txt` is the index: H1, a blockquote summary, detail paragraphs, then H2 file lists. Its
+`## Optional` section has a defined meaning in the spec, namely links that may be skipped when a
+shorter context is needed. `index.html.md` is the spec's clean-markdown copy of the page, and is
+what `llms.txt` points at. Prose unique to these files lives in the `LLMS` constant.
 
 ## Code style
 

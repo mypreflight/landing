@@ -48,11 +48,15 @@ when the version already exists as a tag.
 
 GitHub Pages via GitHub Actions. In **Settings → Pages**, set the source to "GitHub Actions".
 
-There is intentionally **no `public/CNAME`**. `mypreflight.io` is currently the verified Pages
-domain of the `flight-tracker-app` repository, and two repositories cannot claim it at once. When
-the app moves to `app.mypreflight.io`, add `public/CNAME` here with `mypreflight.io` and set the
-custom domain in Settings → Pages. `site` in `astro.config.mjs` already points at the target
-domain, so canonical and sitemap URLs are correct ahead of the move.
+`mypreflight.io` is served by this repository. The custom domain is set in **Settings → Pages**
+rather than through a `public/CNAME` file, which is why none is committed. `site` in
+`astro.config.mjs` points at that domain, so canonical, sitemap and Open Graph URLs are absolute
+and correct.
 
-`APP_URL` in `src/constants.ts` points at `https://app.mypreflight.io` — the app's post-move home.
-It does not resolve yet.
+`APP_URL` in `src/constants.ts` points at `https://app.mypreflight.io`, which is the app.
+
+GitHub Pages serves every asset with `Cache-Control: max-age=600` and does not allow custom
+headers. That is the one cost of self-hosting the font (see "Fonts"): repeat visitors revalidate it
+every ten minutes, though the response is a 304 on an already-open connection and `font-display:
+swap` paints text immediately regardless. Putting a CDN in front of the domain would allow a long
+immutable cache instead.

@@ -128,6 +128,18 @@ export const FAQ = {
   ],
 } as const;
 
+export const NOT_FOUND = {
+  title: `Page not found, ${SITE_NAME}`,
+  description: "Page or resource not found. Head back to the MyPreflight home page.",
+  display: "404",
+  heading: "Page or resource not found",
+  lead: "The link may be out of date, or it may never have existed.",
+  requestedLabel: "Requested",
+  action: "Back to home",
+  mistakePrefix: "If you think this is a mistake,",
+  mistakeLink: "tell us all about it on Discord",
+} as const;
+
 export const CLOSING_CTA = {
   heading: "We are building it now.",
   lead: "Launch is scheduled for late 2026. Come and help shape what the board becomes.",

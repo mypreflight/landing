@@ -5,15 +5,11 @@ import Hero from "../components/Hero.astro";
 import Section from "../components/Section.astro";
 import Steps from "../components/Steps.astro";
 import VisualSlot from "../components/VisualSlot.astro";
-import { FEATURES, PRODUCT_LEAD, SITE_NAME } from "../constants";
+import { FEATURES, PRODUCT_LEAD, SITE_DESCRIPTION, SITE_TITLE } from "../constants";
 import Layout from "../layouts/Layout.astro";
-
-const title = `${SITE_NAME}, the electronic flight board for flight simulation`;
-const description =
-  "MyPreflight is the electronic flight board for flight simulation: dispatch, briefing, check-in and live tracking, in the browser. The site is in preparation.";
 ---
 
-<Layout title={title} description={description}>
+<Layout title={SITE_TITLE} description={SITE_DESCRIPTION}>
   <main class="flex-1">
     <Hero />
 

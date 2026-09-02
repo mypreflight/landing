@@ -7,6 +7,17 @@ export const OWNER_URL = "https://barcz.me";
 
 export const CTA_DISCORD_LABEL = "Chat with us on Discord";
 
+export const SITE_TITLE = `${SITE_NAME}, the electronic flight board for flight simulation`;
+export const SITE_DESCRIPTION =
+  "Flight dispatch, real briefing materials, live tracking and a logbook for flight simulation, in one dashboard that runs in your browser. Launching late 2026.";
+
+export const OG_IMAGE = {
+  path: "/og.png",
+  width: 1200,
+  height: 630,
+  alt: "MyPreflight, the electronic flight board for flight simulation, beside a leg tracked live from Boston to Philadelphia.",
+} as const;
+
 export const HERO = {
   eyebrow: "In development",
   heading: {
@@ -83,7 +94,10 @@ export const HOW_IT_WORKS = {
       detail: "Pick a route and an aircraft, import your SimBrief flight plan, get the briefings.",
     },
     { title: "Brief your flight", detail: "Check your weather, NOTAMs, route, cargo manifests and passenger list." },
-    { title: "Just fly", detail: "Track the flight from pushback through to shutdown. The app measures your time and performance." },
+    {
+      title: "Just fly",
+      detail: "Track the flight from pushback through to shutdown. The app measures your time and performance.",
+    },
   ],
 } as const;
 
@@ -103,19 +117,54 @@ export const FAQ = {
     },
     {
       question: "What will it cost?",
-      answer: "Base platform should remain free. Processing flight plans, generating briefings and general flight tracking infrastructure is cheap to run. Unless any of these circumstances change, platform remains free.",
+      answer:
+        "Base platform should remain free. Processing flight plans, generating briefings and general flight tracking infrastructure is cheap to run. Unless any of these circumstances change, platform remains free.",
     },
     {
       question: "Can I ask for a feature?",
       answer:
         "We highly encourage you to leave your feature requests and feedback right on our Discord. That is where the build is discussed, and where a suggestion is most likely to reach the development team!",
-    }
+    },
   ],
 } as const;
 
 export const CLOSING_CTA = {
   heading: "We are building it now.",
   lead: "Launch is scheduled for late 2026. Come and help shape what the board becomes.",
+} as const;
+
+export const LLMS = {
+  summary:
+    "MyPreflight is a set of connected tools for flight simulation: flight dispatch, real briefing materials, live tracking and a logbook, combined in one dashboard that runs in the browser. It is in early testing, and the public launch is scheduled for late 2026.",
+  detail: [
+    "The board reads a flight plan from SimBrief, or a booking made with a virtual airline, and prepares the documents dispatch would hand to a crew: a passenger information list, cargo manifests and load plans. It works out what sort of flight it is, then has the route, the weather and the NOTAMs ready before you reach the cockpit.",
+    "Once the leg is live, position, altitude and phase update as you fly, and the aircraft, crew, cargo and times stay pinned to the flight. Every leg files itself the moment you shut down, so hours on type, fields visited and landings counted day and night all end up in the logbook.",
+    "At release the supported setup is Windows 10 or 11 running Microsoft Flight Simulator 2020 or 2024. The dashboard itself runs in any browser, on a computer, tablet or phone, but reading position and flight state out of the simulator needs a free companion app running alongside it. The base platform is expected to remain free.",
+    "Development is posted on Discord first. That is also where feature requests reach the development team.",
+  ],
+  sections: [
+    {
+      title: "Docs",
+      links: [
+        {
+          label: "MyPreflight landing page",
+          url: `${SITE_ORIGIN}/index.html.md`,
+          note: "the whole site as plain markdown: what the board does, the four feature areas, how to get started, and the FAQ",
+        },
+      ],
+    },
+    {
+      title: "Product",
+      links: [
+        { label: "MyPreflight app", url: APP_URL, note: "sign in to the flight board" },
+        { label: "Discord", url: DISCORD_URL, note: "development updates, feature requests and support" },
+      ],
+    },
+    {
+      title: "Optional",
+      links: [{ label: OWNER_NAME, url: OWNER_URL, note: "the developer behind MyPreflight" }],
+    },
+  ],
 } as const;
 
 export const FOOTER = {

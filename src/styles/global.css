@@ -2,6 +2,30 @@
 
 @custom-variant dark (&:where(.dark, .dark *));
 
+@font-face {
+  font-family: "Noto Sans";
+  font-style: normal;
+  font-weight: 400 700;
+  font-stretch: 100%;
+  font-display: swap;
+  src: url("/fonts/noto-sans-latin-var.woff2") format("woff2");
+  unicode-range:
+    U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329,
+    U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: "Noto Sans";
+  font-style: normal;
+  font-weight: 400 700;
+  font-stretch: 100%;
+  font-display: swap;
+  src: url("/fonts/noto-sans-latin-ext-var.woff2") format("woff2");
+  unicode-range:
+    U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329,
+    U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+
 @theme {
   --color-indigo-50: #f0f5ff;
   --color-indigo-100: #e5edff;
@@ -34,24 +58,60 @@ body {
   display: block;
 }
 
-@keyframes rise {
-  from {
-    opacity: 0;
-    transform: translateY(0.5rem);
-  }
-  to {
-    opacity: 1;
-    transform: none;
-  }
+.chart-grid {
+  --chart-line: rgb(17 24 39 / 0.05);
+  background-image:
+    linear-gradient(to right, var(--chart-line) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--chart-line) 1px, transparent 1px);
+  background-size: 4rem 4rem;
+  mask-image: linear-gradient(to bottom, black, transparent 75%);
 }
 
-.rise {
-  animation: rise 600ms cubic-bezier(0.16, 1, 0.3, 1) both;
-  animation-delay: var(--rise-delay, 0ms);
+.dark .chart-grid {
+  --chart-line: rgb(255 255 255 / 0.06);
+}
+
+.slot-hatch {
+  --hatch-line: rgb(17 24 39 / 0.04);
+  background-image: repeating-linear-gradient(45deg, var(--hatch-line) 0 1px, transparent 1px 11px);
+}
+
+.dark .slot-hatch {
+  --hatch-line: rgb(255 255 255 / 0.05);
+}
+
+.isogonic path {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1;
+  opacity: 0.14;
+  vector-effect: non-scaling-stroke;
+}
+
+.dark .isogonic path {
+  opacity: 0.18;
+}
+
+[data-reveal="on"] .rise {
+  opacity: 0;
+  transform: translateY(0.5rem);
+}
+
+[data-reveal="on"] .rise.is-visible {
+  opacity: 1;
+  transform: none;
+  transition:
+    opacity 600ms cubic-bezier(0.16, 1, 0.3, 1) var(--rise-delay, 0ms),
+    transform 600ms cubic-bezier(0.16, 1, 0.3, 1) var(--rise-delay, 0ms);
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .rise {
-    animation: none;
+  [data-reveal="on"] .rise {
+    opacity: 1;
+    transform: none;
+  }
+
+  [data-reveal="on"] .rise.is-visible {
+    transition: none;
   }
 }

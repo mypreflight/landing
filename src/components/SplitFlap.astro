@@ -1,0 +1,25 @@
+---
+interface Props {
+  text: string;
+  label: string;
+  size: string;
+  gap?: string;
+}
+
+const { text, label, size, gap = "0.375rem" } = Astro.props;
+const chars = [...text.toUpperCase()];
+---
+
+<div class="flap-row" data-flap-row style={`--flap-size: ${size}; --flap-gap: ${gap}`} role="img" aria-label={label}>
+  {
+    chars.map((char) =>
+      char === " " ? (
+        <span class="flap-space"></span>
+      ) : (
+        <span class="flap" data-flap={char}>
+          {char}
+        </span>
+      ),
+    )
+  }
+</div>

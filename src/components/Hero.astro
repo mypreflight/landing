@@ -1,0 +1,38 @@
+---
+import { HERO } from "../constants";
+import CtaButtons from "./CtaButtons.astro";
+---
+
+<section class="relative isolate overflow-hidden px-6 py-24 sm:py-32">
+  <div aria-hidden="true" class="chart-grid absolute inset-0 -z-10"></div>
+
+  <div class="mx-auto max-w-2xl text-center lg:max-w-3xl">
+    <p class="rise text-xs font-bold tracking-widest text-indigo-600 uppercase dark:text-indigo-400">
+      {HERO.eyebrow}
+    </p>
+
+    <h1
+      class="rise mt-6 text-4xl font-bold tracking-tight text-balance text-gray-900 sm:text-5xl lg:text-6xl dark:text-white"
+      style="--rise-delay: 80ms"
+    >
+      <span class="block">{HERO.heading.before}</span>
+      <span class="block text-indigo-600 dark:text-indigo-400">{HERO.heading.accent}</span>
+      <span class="block">{HERO.heading.after}</span>
+    </h1>
+
+    <p
+      class="rise mx-auto mt-6 max-w-xl text-base leading-relaxed text-gray-500 dark:text-gray-400"
+      style="--rise-delay: 160ms"
+    >
+      {HERO.lead}
+    </p>
+
+    <div class="rise mt-10" style="--rise-delay: 240ms">
+      <CtaButtons class="justify-center" />
+    </div>
+
+    <p class="rise mt-6 text-sm text-gray-500 dark:text-gray-400" style="--rise-delay: 320ms">
+      {HERO.note.map((line) => <span class="block">{line}</span>)}
+    </p>
+  </div>
+</section>

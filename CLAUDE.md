@@ -6,7 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 Public marketing site for MyPreflight, the electronic flight board for flight simulation. The
 application itself lives in a separate repository (`flight-tracker-app`); this repo is the landing
-site only. Right now it is a single in-preparation splash page.
+site only. It is a single marketing page at `/`, still flagged as in-preparation in the hero.
 
 - **Framework**: Astro 7, static output, **no UI framework** — no React, no islands. Interactivity
   is plain `<script>` in `.astro` files. Keep it that way unless the user explicitly asks otherwise.
@@ -67,11 +67,36 @@ Two things are copied from the app on purpose and must stay in sync with it:
 The wordmark is set `mypreflight`, all lowercase, `my` at weight 400 and `preflight` at 700. In
 prose it is `MyPreflight`, one word. The two are not interchangeable.
 
+## Page layout
+
+The page is one fixed sequence of sections, rendered by `src/pages/index.astro`: hero, product
+lead, four feature sections, how-it-works, FAQ, closing CTA, footer.
+
+Every content section goes through **`src/components/Section.astro`** — uppercase eyebrow, `h2`,
+lead paragraph, optional visual slot. It owns the vertical rhythm, the measure and the heading
+styling. Add a section by calling it, never by hand-rolling the markup, or the rhythm drifts.
+Feature sections pass `reverse` alternately so the visual swaps side at `lg`. Headings are written
+as claims in full sentences, not as feature nouns.
+
+Repeating copy — features, steps, FAQ — lives as typed `as const` arrays in `src/constants.ts` and
+is mapped over in the template.
+
+Product screenshots do not exist yet. `VisualSlot.astro` reserves the space with a fixed-ratio
+frame and takes an optional `src`; swapping a real image of the same ratio in causes no layout
+shift. Never fill a slot with fabricated product UI or invented numbers.
+
+Scroll reveal is deliberately fail-open. The inline head script sets `data-reveal="on"` on
+`<html>`, and `.rise` is hidden **only** under that attribute, so if JavaScript never runs nothing
+is ever hidden. A single `IntersectionObserver` in `Layout.astro` adds `.is-visible` once per
+element. Do not invert this to a plain `opacity: 0` default.
+
 ## Code style
 
 - **No comments. Ever.** No explanatory comments, section headers, JSDoc or TODOs. Code must be
   self-explanatory through clear names and structure; refactor instead of commenting.
 - All user-facing copy is **English**.
+- **No em dashes in user-facing copy.** Readers now take them as a tell that the text was
+  machine-written. Use a colon, a comma or a full stop instead.
 - URLs and site copy constants live in `src/constants.ts`, not inline.
 - **Use Tailwind's scale, never arbitrary values.** No `text-[0.6875rem]`, `max-w-[46ch]`,
   `h-[22px]`: pick the nearest scale step (`text-xs`, `max-w-sm`, `size-5`). If a value truly has

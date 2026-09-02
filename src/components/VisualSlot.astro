@@ -1,0 +1,47 @@
+---
+interface Props {
+  src?: string;
+  srcDark?: string;
+  alt?: string;
+  class?: string;
+}
+
+const { src, srcDark, alt = "", class: className } = Astro.props;
+
+const frame = "aspect-video w-full rounded-xl border border-gray-200 object-cover dark:border-gray-800";
+---
+
+{
+  src ? (
+    <>
+      <img
+        src={src}
+        alt={alt}
+        width="1600"
+        height="900"
+        loading="lazy"
+        decoding="async"
+        class:list={[frame, srcDark && "dark:hidden", className]}
+      />
+      {srcDark && (
+        <img
+          src={srcDark}
+          alt={alt}
+          width="1600"
+          height="900"
+          loading="lazy"
+          decoding="async"
+          class:list={[frame, "hidden dark:block", className]}
+        />
+      )}
+    </>
+  ) : (
+    <div
+      aria-hidden="true"
+      class:list={[
+        "slot-hatch aspect-video w-full rounded-xl border border-dashed border-gray-300 dark:border-gray-700",
+        className,
+      ]}
+    />
+  )
+}

@@ -1,0 +1,22 @@
+---
+import { CTA_DISCORD_LABEL, DISCORD_URL } from "../constants";
+import DiscordIcon from "./DiscordIcon.astro";
+
+interface Props {
+  class?: string;
+}
+
+const { class: className } = Astro.props;
+---
+
+<div class:list={["flex", className]}>
+  <a
+    href={DISCORD_URL}
+    rel="noopener noreferrer"
+    target="_blank"
+    class="inline-flex items-center justify-center gap-2 rounded-lg bg-indigo-600 px-5 py-2.5 text-sm font-bold text-white transition-colors duration-200 hover:bg-indigo-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500 dark:text-gray-100"
+  >
+    <DiscordIcon class="h-4 w-4 shrink-0" />
+    {CTA_DISCORD_LABEL}
+  </a>
+</div>

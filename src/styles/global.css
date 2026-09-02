@@ -34,24 +34,60 @@ body {
   display: block;
 }
 
-@keyframes rise {
-  from {
-    opacity: 0;
-    transform: translateY(0.5rem);
-  }
-  to {
-    opacity: 1;
-    transform: none;
-  }
+.chart-grid {
+  --chart-line: rgb(17 24 39 / 0.05);
+  background-image:
+    linear-gradient(to right, var(--chart-line) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--chart-line) 1px, transparent 1px);
+  background-size: 4rem 4rem;
+  mask-image: linear-gradient(to bottom, black, transparent 75%);
 }
 
-.rise {
-  animation: rise 600ms cubic-bezier(0.16, 1, 0.3, 1) both;
-  animation-delay: var(--rise-delay, 0ms);
+.dark .chart-grid {
+  --chart-line: rgb(255 255 255 / 0.06);
+}
+
+.slot-hatch {
+  --hatch-line: rgb(17 24 39 / 0.04);
+  background-image: repeating-linear-gradient(45deg, var(--hatch-line) 0 1px, transparent 1px 11px);
+}
+
+.dark .slot-hatch {
+  --hatch-line: rgb(255 255 255 / 0.05);
+}
+
+.isogonic path {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1;
+  opacity: 0.14;
+  vector-effect: non-scaling-stroke;
+}
+
+.dark .isogonic path {
+  opacity: 0.18;
+}
+
+[data-reveal="on"] .rise {
+  opacity: 0;
+  transform: translateY(0.5rem);
+}
+
+[data-reveal="on"] .rise.is-visible {
+  opacity: 1;
+  transform: none;
+  transition:
+    opacity 600ms cubic-bezier(0.16, 1, 0.3, 1) var(--rise-delay, 0ms),
+    transform 600ms cubic-bezier(0.16, 1, 0.3, 1) var(--rise-delay, 0ms);
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .rise {
-    animation: none;
+  [data-reveal="on"] .rise {
+    opacity: 1;
+    transform: none;
+  }
+
+  [data-reveal="on"] .rise.is-visible {
+    transition: none;
   }
 }

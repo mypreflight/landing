@@ -1,10 +1,20 @@
 ---
 import SplitFlap from "../components/SplitFlap.astro";
-import { DISCORD_URL, NOT_FOUND } from "../constants";
+import { APP_PATH_PREFIXES, APP_URL, DISCORD_URL, NOT_FOUND } from "../constants";
 import Layout from "../layouts/Layout.astro";
 ---
 
 <Layout title={NOT_FOUND.title} description={NOT_FOUND.description} robots="noindex, follow">
+  <Fragment slot="head">
+    <script is:inline define:vars={{ appUrl: APP_URL, prefixes: APP_PATH_PREFIXES }}>
+      (() => {
+        const path = window.location.pathname.replace(/\/$/, "") || "/";
+        if (!prefixes.some((prefix) => path === prefix || path.startsWith(`${prefix}/`))) return;
+        window.location.replace(appUrl + path + window.location.search + window.location.hash);
+      })();
+    </script>
+  </Fragment>
+
   <main class="flex flex-1 items-center px-6 py-24 sm:py-32">
     <div class="mx-auto flex w-full max-w-2xl flex-col items-center text-center">
       <h1>

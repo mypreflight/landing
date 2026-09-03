@@ -1,0 +1,91 @@
+---
+import PolicyDocument from "../components/PolicyDocument.astro";
+import { PRIVACY } from "../constants";
+import { PRIVACY_LONG as long, PRIVACY_SHORT as short } from "../content/privacy";
+import Layout from "../layouts/Layout.astro";
+---
+
+<Layout title={PRIVACY.title} description={PRIVACY.description}>
+  <main class="flex-1 px-6 py-20 sm:py-28">
+    <div class="mx-auto max-w-5xl">
+      <div class="max-w-2xl">
+        <p class="text-xs font-bold tracking-widest text-indigo-600 uppercase dark:text-indigo-400">
+          {PRIVACY.eyebrow}
+        </p>
+        <h1 class="mt-4 text-3xl font-bold tracking-tight text-balance text-gray-900 sm:text-4xl dark:text-white">
+          {PRIVACY.heading}
+        </h1>
+        <p class="mt-5 text-base leading-relaxed text-gray-500 dark:text-gray-400">{PRIVACY.lead}</p>
+        <p class="mt-6 font-mono text-xs tracking-wide text-gray-500 dark:text-gray-400">
+          {PRIVACY.versionLabel} <span class="font-bold text-indigo-600 dark:text-indigo-400">{PRIVACY.version}</span>,{" "}
+          {PRIVACY.effectiveLabel} <time class="font-bold text-indigo-600 dark:text-indigo-400" datetime={PRIVACY.effectiveDateIso}>{PRIVACY.effectiveDate}</time>
+        </p>
+      </div>
+
+      <div class="policy-mode mt-12 lg:grid lg:grid-cols-4 lg:gap-12">
+        <div
+          class="sticky top-14 z-10 -mx-6 border-b border-gray-200 bg-white/85 px-6 py-4 backdrop-blur-md lg:top-24 lg:mx-0 lg:self-start lg:border-0 lg:bg-transparent lg:px-0 lg:py-0 lg:backdrop-blur-none dark:border-gray-800 dark:bg-gray-950/85 lg:dark:bg-transparent"
+        >
+          <fieldset>
+            <legend class="sr-only">{PRIVACY.modeLabel}</legend>
+            <div class="flex rounded-lg bg-gray-100 p-1 lg:flex-col dark:bg-gray-900">
+              <input class="sr-only" type="radio" name="policy-mode" id="policy-short" checked />
+              <label class="seg-option" for="policy-short">{PRIVACY.modeShort}</label>
+              <input class="sr-only" type="radio" name="policy-mode" id="policy-long" />
+              <label class="seg-option" for="policy-long">{PRIVACY.modeLong}</label>
+            </div>
+          </fieldset>
+
+          <nav class="mt-8 hidden lg:block" aria-label={PRIVACY.outlineLabel}>
+            <p class="text-xs font-bold tracking-widest text-gray-500 uppercase dark:text-gray-400">
+              {PRIVACY.outlineLabel}
+            </p>
+            {
+              (
+                [
+                  ["short", short],
+                  ["long", long],
+                ] as const
+              ).map(([mode, policy]) => (
+                <ol class="mt-4 flex flex-col gap-2.5" data-policy={mode}>
+                  {policy.sections.map((section) => (
+                    <li class="flex gap-2 text-sm leading-snug">
+                      <span aria-hidden="true" class="font-mono text-xs text-gray-500 dark:text-gray-500">
+                        {section.number}
+                      </span>
+                      <a
+                        href={`#${mode}-${section.number}`}
+                        class="min-w-0 text-gray-500 transition-colors duration-200 hover:text-indigo-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500 dark:text-gray-400 dark:hover:text-indigo-400"
+                      >
+                        {section.title}
+                      </a>
+                    </li>
+                  ))}
+                </ol>
+              ))
+            }
+          </nav>
+        </div>
+
+        <div class="lg:col-span-3">
+          <div data-policy="short">
+            <PolicyDocument policy={short} idPrefix="short" />
+          </div>
+          <div data-policy="long">
+            <PolicyDocument policy={long} idPrefix="long" />
+          </div>
+        </div>
+      </div>
+
+      <p class="mt-12 border-t border-gray-200 pt-8 text-sm text-gray-500 dark:border-gray-800 dark:text-gray-400">
+        {PRIVACY.contactLabel}{" "}
+        <a
+          href={`mailto:${PRIVACY.contactEmail}`}
+          class="font-bold text-indigo-600 underline decoration-indigo-300 underline-offset-2 transition-colors duration-200 hover:decoration-indigo-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500 dark:text-indigo-400 dark:decoration-indigo-700 dark:hover:decoration-indigo-400"
+        >
+          {PRIVACY.contactEmail}
+        </a>.
+      </p>
+    </div>
+  </main>
+</Layout>

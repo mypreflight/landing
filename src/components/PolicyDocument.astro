@@ -1,0 +1,86 @@
+---
+import type { Policy } from "../lib/policy";
+
+interface Props {
+  policy: Policy;
+  idPrefix: string;
+}
+
+const { policy, idPrefix } = Astro.props;
+---
+
+<div>
+  <div class="flex flex-col gap-10">
+    {
+      policy.sections.map((section) => (
+        <section id={`${idPrefix}-${section.number}`} class="scroll-mt-24 border-t border-gray-200 pt-8 dark:border-gray-800">
+          <h2 class="flex gap-3 text-lg font-bold tracking-tight text-gray-900 dark:text-white">
+            <span class="font-mono text-gray-500 dark:text-gray-500">{section.number}.</span>
+            <span class="min-w-0">{section.title}</span>
+          </h2>
+
+          <div class="mt-4 flex flex-col gap-4">
+            {section.blocks.map((block) =>
+              block.kind === "paragraph" ? (
+                <p class="text-sm leading-relaxed text-gray-600 dark:text-gray-300">{block.text}</p>
+              ) : block.kind === "lines" ? (
+                <p class="text-sm leading-relaxed text-gray-600 dark:text-gray-300">
+                  {block.lines.map((line, index) => (
+                    <>
+                      {index > 0 && <br />}
+                      {line}
+                    </>
+                  ))}
+                </p>
+              ) : block.kind === "list" ? (
+                <ul class="flex flex-col gap-2">
+                  {block.items.map((item) => (
+                    <li class="flex gap-3 text-sm leading-relaxed text-gray-600 dark:text-gray-300">
+                      <span aria-hidden="true" class="mt-2 size-1 shrink-0 rounded-full bg-indigo-500" />
+                      <span class="min-w-0">{item}</span>
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <div class="overflow-x-auto rounded-lg border border-gray-200 dark:border-gray-800">
+                  <table class="w-full min-w-md border-collapse text-left text-sm">
+                    <thead>
+                      <tr class="bg-gray-50 dark:bg-gray-900">
+                        {block.head.map((cell) => (
+                          <th
+                            scope="col"
+                            class="px-4 py-2.5 text-xs font-bold tracking-widest whitespace-nowrap text-gray-500 uppercase dark:text-gray-400"
+                          >
+                            {cell}
+                          </th>
+                        ))}
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {block.rows.map((row) => (
+                        <tr class="border-t border-gray-200 align-top dark:border-gray-800">
+                          {row.map((cell, index) => (
+                            <td
+                              class:list={[
+                                "px-4 py-2.5 leading-relaxed",
+                                index === 0
+                                  ? "w-2/5 font-bold text-gray-900 dark:text-white"
+                                  : "text-gray-600 dark:text-gray-300",
+                              ]}
+                            >
+                              {cell}
+                            </td>
+                          ))}
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              ),
+            )}
+          </div>
+        </section>
+      ))
+    }
+  </div>
+</div>

@@ -4,6 +4,9 @@ import { defineConfig } from "astro/config";
 
 export default defineConfig({
   site: "https://mypreflight.io",
+  redirects: {
+    "/sign-in": "https://app.mypreflight.io/sign-in",
+  },
   prefetch: {
     prefetchAll: true,
     defaultStrategy: "hover",

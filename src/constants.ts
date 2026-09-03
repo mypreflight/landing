@@ -7,6 +7,8 @@ export const OWNER_URL = "https://barcz.me";
 
 export const CTA_DISCORD_LABEL = "Chat with us on Discord";
 
+export const APP_PATH_PREFIXES = ["/map"] as const;
+
 export const SITE_TITLE = `${SITE_NAME}, the electronic flight board for flight simulation`;
 export const SITE_DESCRIPTION =
   "Flight dispatch, real briefing materials, live tracking and a logbook for flight simulation, in one dashboard that runs in your browser. Launching late 2026.";
@@ -128,6 +130,46 @@ export const FAQ = {
   ],
 } as const;
 
+export const PRIVACY = {
+  title: `Privacy policy, ${SITE_NAME}`,
+  description:
+    "Short and full descriptions of what data MyPreflight app collects, why it needs it, and how long it is kept.",
+  eyebrow: "How we manage your data?",
+  heading: "Privacy policy",
+  lead: "Short and full descriptions of what data MyPreflight app collects, why it needs it, and how long it is kept.",
+  versionLabel: "Version:",
+  version: "1.0",
+  effectiveLabel: "effective",
+  effectiveDate: "1 September 2026",
+  effectiveDateIso: "2026-09-01",
+  modeLabel: "Choose how much detail to read",
+  modeKicker: "Reading",
+  modeShort: "Simple language",
+  modeLong: "Full legal text",
+  outlineLabel: "On this page",
+  contactLabel: "Privacy questions go to",
+  contactEmail: "gdpr@mypreflight.io",
+} as const;
+
+export const TERMS = {
+  title: `Terms of service, ${SITE_NAME}`,
+  description:
+    "The terms you agree to when using MyPreflight: what the service is, acceptable use, the aviation disclaimer, your content, and liability.",
+  eyebrow: "The rules of using MyPreflight",
+  heading: "Terms of service",
+  lead: "What MyPreflight is, what you agree to when you use it, and what it is explicitly not a substitute for.",
+  versionLabel: "Version:",
+  version: "1.0",
+  effectiveLabel: "effective",
+  effectiveDate: "1 September 2026",
+  effectiveDateIso: "2026-09-01",
+  outlineLabel: "On this page",
+  contactLabel: "Questions about these terms go to",
+  contactEmail: "gdpr@mypreflight.io",
+  privacyPrefix: "Personal data is covered separately in the",
+  privacyLink: "privacy policy",
+} as const;
+
 export const NOT_FOUND = {
   title: `Page not found, ${SITE_NAME}`,
   description: "Page or resource not found. Head back to the MyPreflight home page.",
@@ -180,6 +222,22 @@ export const LLMS = {
 } as const;
 
 export const FOOTER = {
+  groups: [
+    {
+      label: "Product",
+      links: [
+        { label: "Sign in", href: `${APP_URL}/sign-in`, external: true },
+        { label: "Discord", href: DISCORD_URL, external: true },
+      ],
+    },
+    {
+      label: "Legal",
+      links: [
+        { label: "Privacy policy", href: "/privacy", external: false },
+        { label: "Terms of service", href: "/terms", external: false },
+      ],
+    },
+  ],
   creditPrefix: " a digital product created by",
   description: [
     "MyPreflight is a set of connected tools for flight simulation. Flight dispatch, real briefing materials, live tracking and logbook combined in one, convenient dashboard.",

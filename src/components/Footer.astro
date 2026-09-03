@@ -10,20 +10,48 @@ const year = new Date().getFullYear();
   <IsogonicField />
 
   <div class="mx-auto max-w-6xl">
-    <div class="flex items-center">
-      <Mark class="mr-2.5 h-5 w-auto text-indigo-500" />
-      <span class="text-base font-normal text-indigo-500 dark:text-indigo-400">
-        my<span class="font-bold">preflight</span>
-      </span>
+    <div class="flex flex-col gap-12 lg:grid lg:grid-cols-4 lg:gap-10">
+      <div class="lg:col-span-2">
+        <div class="flex items-center">
+          <Mark class="mr-2.5 h-5 w-auto text-indigo-500" />
+          <span class="text-base font-normal text-indigo-500 dark:text-indigo-400">
+            my<span class="font-bold">preflight</span>
+          </span>
+        </div>
+
+        {
+          FOOTER.description.map((paragraph) => (
+            <p class="mt-5 max-w-prose text-sm leading-relaxed text-gray-500 dark:text-gray-400">{paragraph}</p>
+          ))
+        }
+      </div>
+
+      {
+        FOOTER.groups.map((group) => (
+          <nav aria-label={group.label}>
+            <p class="text-xs font-bold tracking-widest text-gray-500 uppercase dark:text-gray-400">{group.label}</p>
+            <ul class="mt-4 flex flex-col gap-3">
+              {group.links.map((link) => (
+                <li>
+                  <a
+                    href={link.href}
+                    rel={link.external ? "noopener noreferrer" : undefined}
+                    target={link.external ? "_blank" : undefined}
+                    class="text-sm text-gray-600 transition-colors duration-200 hover:text-indigo-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500 dark:text-gray-300 dark:hover:text-indigo-400"
+                  >
+                    {link.label}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </nav>
+        ))
+      }
     </div>
 
-    {
-      FOOTER.description.map((paragraph) => (
-        <p class="mt-5 max-w-prose text-sm leading-relaxed text-gray-500 dark:text-gray-400">{paragraph}</p>
-      ))
-    }
-
-    <p class="mt-12 text-sm text-gray-500 dark:text-gray-400">
+    <p
+      class="mt-12 border-t border-gray-200 pt-8 text-sm text-gray-500 dark:border-gray-800 dark:text-gray-400"
+    >
       &copy; {year} {SITE_NAME},{FOOTER.creditPrefix}{" "}
       <a
         href={OWNER_URL}

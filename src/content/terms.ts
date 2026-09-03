@@ -63,7 +63,10 @@ export const TERMS_DOCUMENT: Policy = {
       number: "4",
       title: "Accounts",
       blocks: [
-        { kind: "paragraph", text: "You must provide accurate, real account information and keep it reasonably up to date." },
+        {
+          kind: "paragraph",
+          text: "You must provide accurate, real account information and keep it reasonably up to date.",
+        },
         { kind: "paragraph", text: "You are responsible for:" },
         {
           kind: "list",

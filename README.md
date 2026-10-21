@@ -1,4 +1,8 @@
-# landing
+<div align="center">
+
+[![landing][banner]][homepage]
+
+</div>
 
 Public marketing site for **MyPreflight** — the electronic flight board for flight simulation.
 
@@ -60,3 +64,6 @@ headers. That is the one cost of self-hosting the font (see "Fonts"): repeat vis
 every ten minutes, though the response is a 304 on an already-open connection and `font-display:
 swap` paints text immediately regardless. Putting a CDN in front of the domain would allow a long
 immutable cache instead.
+
+[banner]: .github/image/banner.png
+[homepage]: https://mypreflight.io

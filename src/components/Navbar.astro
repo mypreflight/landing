@@ -1,5 +1,5 @@
 ---
-import { APP_URL } from "../constants";
+import { APP_URL, CHANGELOG, NAV } from "../constants";
 import Mark from "./Mark.astro";
 
 const iconHigh =
@@ -8,47 +8,119 @@ const iconLow =
   "M20 15.31 23.31 12 20 8.69V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20zM12 18c-3.31 0-6-2.69-6-6s2.69-6 6-6 6 2.69 6 6-2.69 6-6 6";
 const iconAuto =
   "M10.85 12.65h2.3L12 9zM20 8.69V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12zM14.3 16l-.7-2h-3.2l-.7 2H7.8L11 7h2l3.2 9z";
+
+const onChangelog = Astro.url.pathname.startsWith(CHANGELOG.path);
 ---
 
-<header
-  id="site-header"
-  data-scrolled="false"
-  class="sticky top-0 z-50 border-b border-transparent bg-white/80 backdrop-blur-md transition-colors duration-300 data-[scrolled=true]:border-gray-200 dark:bg-gray-950/80 dark:data-[scrolled=true]:border-gray-800"
->
-  <nav class="flex w-full flex-wrap items-center justify-between px-2 py-2.5 sm:px-4">
-    <a href="/" class="flex items-center">
-      <Mark class="mr-2.5 h-5 w-auto text-indigo-500 sm:h-7" />
-      <span class="self-center text-lg font-normal whitespace-nowrap text-indigo-500 dark:text-indigo-400">
+<header id="site-header" data-scrolled="false" class="group sticky top-0 z-50 -mb-15 px-2 pt-3">
+  <nav
+    data-dock
+    data-static
+    class="dock group/dock mx-auto flex h-12 max-w-dock items-center gap-1 rounded-2xl border border-gray-900/10 bg-white/70 ps-4 pe-2 shadow-sm shadow-gray-900/5 backdrop-blur-xl backdrop-saturate-150 transition duration-300 group-data-[scrolled=true]:bg-white/85 group-data-[scrolled=true]:shadow-lg group-data-[scrolled=true]:shadow-gray-900/10 dark:border-white/10 dark:bg-gray-900/60 dark:shadow-black/20 dark:group-data-[scrolled=true]:bg-gray-900/80 dark:group-data-[scrolled=true]:shadow-black/40"
+  >
+    <a
+      href="/"
+      aria-label={NAV.homeLabel}
+      class="flex shrink-0 items-center rounded-lg focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
+    >
+      <Mark class="me-2 h-5 w-auto text-indigo-500" />
+      <span class="text-base font-normal whitespace-nowrap text-indigo-500 dark:text-indigo-400">
         my<span class="font-bold">preflight</span>
       </span>
     </a>
-    <div class="flex items-center gap-2">
+
+    <div data-dock-items class="relative isolate ms-auto flex items-center gap-1">
+      <span
+        data-dock-pill
+        aria-hidden="true"
+        class="dock-pill pointer-events-none absolute inset-y-0 left-0 -z-10 rounded-lg bg-gray-900/5 dark:bg-white/10"
+      ></span>
+      <a
+        data-dock-item
+        href={CHANGELOG.path}
+        aria-current={onChangelog ? "page" : undefined}
+        class:list={[
+          "flex h-8 items-center rounded-lg px-2.5 text-sm font-semibold whitespace-nowrap transition-colors duration-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500 sm:px-3",
+          onChangelog
+            ? "text-gray-900 group-data-static/dock:bg-gray-900/5 dark:text-white dark:group-data-static/dock:bg-white/10"
+            : "text-gray-600 hover:text-gray-900 group-data-static/dock:hover:bg-gray-900/5 dark:text-gray-300 dark:hover:text-white dark:group-data-static/dock:hover:bg-white/10",
+        ]}
+      >
+        {NAV.changelogLabel}
+      </a>
       <button
+        data-dock-item
         id="theme-toggle"
         type="button"
-        title="Switch theme"
-        aria-label="Switch theme"
-        class="rounded-xl p-2 text-gray-500 transition-colors duration-200 hover:bg-gray-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500 dark:text-gray-400 dark:hover:bg-gray-800"
+        title={NAV.themeLabel}
+        aria-label={NAV.themeLabel}
+        class="grid size-8 place-items-center rounded-lg text-gray-500 transition-colors duration-200 hover:text-gray-900 group-data-static/dock:hover:bg-gray-900/5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500 dark:text-gray-400 dark:hover:text-white dark:group-data-static/dock:hover:bg-white/10"
       >
-        <svg class="theme-icon-light hidden h-[22px] w-[22px] fill-current" viewBox="0 0 24 24" aria-hidden="true">
+        <svg class="theme-icon-light hidden size-4.5 fill-current" viewBox="0 0 24 24" aria-hidden="true">
           <path d={iconHigh}></path>
         </svg>
-        <svg class="theme-icon-dark hidden h-[22px] w-[22px] fill-current" viewBox="0 0 24 24" aria-hidden="true">
+        <svg class="theme-icon-dark hidden size-4.5 fill-current" viewBox="0 0 24 24" aria-hidden="true">
           <path d={iconLow}></path>
         </svg>
-        <svg class="theme-icon-auto hidden h-[22px] w-[22px] fill-current" viewBox="0 0 24 24" aria-hidden="true">
+        <svg class="theme-icon-auto hidden size-4.5 fill-current" viewBox="0 0 24 24" aria-hidden="true">
           <path d={iconAuto}></path>
         </svg>
       </button>
       <a
         href={`${APP_URL}/sign-in`}
-        class="rounded-lg bg-indigo-600 px-5 py-2.5 text-sm font-bold text-white transition-colors duration-200 hover:bg-indigo-700 focus:ring-4 focus:ring-indigo-500 focus:outline-none dark:text-gray-100 dark:focus:ring-indigo-400"
+        class="flex h-8 items-center rounded-lg bg-gray-900 px-3.5 text-sm font-semibold whitespace-nowrap text-white transition-colors duration-200 hover:bg-gray-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500 dark:bg-white dark:text-gray-900 dark:hover:bg-gray-200"
       >
-        Sign In
+        {NAV.signInLabel}
       </a>
     </div>
   </nav>
 </header>
+
+<script is:inline>
+  (() => {
+    const dock = document.querySelector("[data-dock]");
+    const group = dock?.querySelector("[data-dock-items]");
+    const pill = group?.querySelector("[data-dock-pill]");
+    if (!dock || !group || !pill) return;
+
+    const items = [...group.querySelectorAll("[data-dock-item]")];
+    const rest = items.find((item) => item.getAttribute("aria-current") === "page") ?? null;
+    let target = null;
+
+    const place = (next, snap = false) => {
+      target = next;
+      if (!next) {
+        pill.removeAttribute("data-visible");
+        return;
+      }
+      const appearing = !pill.hasAttribute("data-visible");
+      pill.dataset.motion = snap ? "snap" : appearing ? "appear" : "glide";
+      pill.style.setProperty("--pill-x", `${next.offsetLeft}px`);
+      pill.style.setProperty("--pill-w", `${next.offsetWidth}px`);
+      pill.setAttribute("data-visible", "");
+      pill.getBoundingClientRect();
+      pill.dataset.motion = "glide";
+    };
+
+    place(rest, true);
+    dock.removeAttribute("data-static");
+
+    group.addEventListener("pointerover", (event) => {
+      if (event.pointerType !== "mouse" || event.target === group) return;
+      place(event.target.closest("[data-dock-item]") ?? rest);
+    });
+    group.addEventListener("pointerleave", (event) => {
+      if (event.pointerType === "mouse") place(rest);
+    });
+    group.addEventListener("focusin", (event) => {
+      if (event.target.matches(":focus-visible")) place(event.target.closest("[data-dock-item]") ?? rest);
+    });
+    group.addEventListener("focusout", (event) => {
+      if (!group.contains(event.relatedTarget)) place(rest);
+    });
+    new ResizeObserver(() => place(target, true)).observe(group);
+  })();
+</script>
 
 <script>
   const MODES = ["light", "dark", "auto"] as const;

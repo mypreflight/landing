@@ -6,8 +6,9 @@
 
 Public marketing site for **MyPreflight** — the electronic flight board for flight simulation.
 
-Static [Astro](https://astro.build) site, no UI framework, no server runtime. Currently an
-in-preparation splash.
+Static [Astro](https://astro.build) site, no UI framework, no server runtime: the marketing page,
+the legal pages and the [changelog](https://mypreflight.io/changelog). How to add a changelog entry
+is in `AGENTS.md`, under "Changelog".
 
 ## Commands
 
@@ -31,10 +32,13 @@ Node 26 (see `.nvmrc`).
 ├── public/            static assets served as-is (favicons, robots.txt)
 ├── src/
 │   ├── components/    Mark, Navbar
+│   ├── content/
+│   │   └── changelog/ one folder per changelog entry: index.md and its screenshots
 │   ├── layouts/       page shell — head, theme bootstrap, nav
 │   ├── pages/         file-based routes
 │   ├── styles/        global.css — Tailwind v4 entry and design tokens
-│   └── constants.ts   site origin, app URL, Discord invite
+│   ├── constants.ts   site origin, app URL, Discord invite
+│   └── content.config.ts  the changelog entry schema
 └── astro.config.mjs
 ```
 

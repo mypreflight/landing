@@ -1,0 +1,108 @@
+---
+import type { ImageMetadata } from "astro";
+import { CHANGELOG } from "../constants";
+import { typeset } from "../lib/changelog";
+
+interface Shot {
+  light: ImageMetadata;
+  dark?: ImageMetadata;
+  alt: string;
+  caption?: string;
+}
+
+interface Props {
+  name: string;
+  before?: Shot;
+  after: Shot;
+  note?: string;
+}
+
+const { name, before, after, note } = Astro.props;
+
+const states: ["before" | "after", Shot][] = before
+  ? [
+      ["before", before],
+      ["after", after],
+    ]
+  : [["after", after]];
+
+const atRetina = (image: ImageMetadata) => ({
+  width: Math.round(image.width / 2),
+  height: Math.round(image.height / 2),
+});
+
+const widest = Math.max(...states.map(([, shot]) => atRetina(shot.light).width));
+const layout = widest <= 400 ? "side-lg" : widest <= 600 ? "side-xl" : "stack";
+
+const frame = "h-auto max-w-full rounded-lg ring-1 ring-gray-950/5 dark:ring-white/10";
+const link =
+  "block w-fit max-w-full cursor-zoom-in rounded-lg focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500";
+const hasCaption = states.some(([, shot]) => shot.caption);
+---
+
+<figure class="compare" data-layout={layout}>
+  <div class="compare-shots grid max-w-full">
+    {
+      states.map(([state, shot]) => (
+        <div data-compare={state} class="col-start-1 row-start-1">
+          <a href={shot.light.src} class:list={[link, shot.dark && "dark:hidden"]}>
+            <img
+              src={shot.light.src}
+              {...atRetina(shot.light)}
+              alt={typeset(shot.alt)}
+              loading="lazy"
+              decoding="async"
+              class={frame}
+            />
+          </a>
+          {shot.dark && (
+            <a href={shot.dark.src} class:list={[link, "hidden dark:block"]}>
+              <img
+                src={shot.dark.src}
+                {...atRetina(shot.dark)}
+                alt={typeset(shot.alt)}
+                loading="lazy"
+                decoding="async"
+                class={frame}
+              />
+            </a>
+          )}
+        </div>
+      ))
+    }
+  </div>
+
+  {
+    (before || hasCaption || note) && (
+      <figcaption class="compare-text text-sm leading-relaxed text-pretty text-gray-500 dark:text-gray-400">
+        {before && (
+          <fieldset class="flex shrink-0 gap-4">
+            <legend class="sr-only">{CHANGELOG.compareLabel}</legend>
+            <input class="sr-only" type="radio" name={name} id={`${name}-before`} value="before" />
+            <label class="compare-option" for={`${name}-before`}>
+              {CHANGELOG.beforeLabel}
+            </label>
+            <input class="sr-only" type="radio" name={name} id={`${name}-after`} value="after" checked />
+            <label class="compare-option" for={`${name}-after`}>
+              {CHANGELOG.afterLabel}
+            </label>
+          </fieldset>
+        )}
+        {(hasCaption || note) && (
+          <div class="min-w-0 max-w-prose">
+            {hasCaption && (
+              <div class="grid">
+                {states.map(([state, shot]) => (
+                  <p data-compare={state} class="col-start-1 row-start-1">
+                    {shot.caption && typeset(shot.caption)}
+                  </p>
+                ))}
+              </div>
+            )}
+            {note && <p>{typeset(note)}</p>}
+          </div>
+        )}
+      </figcaption>
+    )
+  }
+</figure>

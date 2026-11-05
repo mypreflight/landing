@@ -1,6 +1,7 @@
 ---
 import { CLOSING_CTA } from "../constants";
 import CtaButtons from "./CtaButtons.astro";
+import ReleaseStatus from "./ReleaseStatus.astro";
 ---
 
 <section class="px-6 py-20 sm:py-28">
@@ -9,6 +10,9 @@ import CtaButtons from "./CtaButtons.astro";
       {CLOSING_CTA.heading}
     </h2>
     <p class="mt-5 text-base leading-relaxed text-gray-500 dark:text-gray-400">{CLOSING_CTA.lead}</p>
-    <CtaButtons class="mt-10 justify-center" />
+    <CtaButtons class="mt-10 justify-center" changelog />
+    <div class="mt-12 flex justify-center">
+      <ReleaseStatus />
+    </div>
   </div>
 </section>

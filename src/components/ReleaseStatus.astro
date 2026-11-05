@@ -1,0 +1,43 @@
+---
+import { CHANGELOG, HERO } from "../constants";
+import { formatDay, getChangelog, typeset } from "../lib/changelog";
+
+const [latest] = await getChangelog();
+const divider = "h-4 w-px shrink-0 bg-gray-200 dark:bg-gray-700";
+---
+
+<a
+  href={CHANGELOG.path}
+  class="group inline-flex max-w-full items-center gap-3 rounded-full border border-gray-200 bg-white py-1.5 ps-3.5 pe-3 text-sm text-gray-600 shadow-xs transition-colors duration-200 hover:border-gray-300 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500 dark:border-gray-800 dark:bg-gray-900 dark:text-gray-300 dark:hover:border-gray-700"
+>
+  <span class="inline-flex shrink-0 items-center gap-2 font-bold text-gray-900 dark:text-white">
+    <span aria-hidden="true" class="size-1.5 rounded-full bg-indigo-500"></span>
+    {HERO.eyebrow}
+  </span>
+  {
+    latest && (
+      <>
+        <span aria-hidden="true" class={divider} />
+        <span class="whitespace-nowrap tabular-nums">
+          {HERO.releaseLabel} <span class="font-bold text-gray-900 dark:text-white">{latest.data.version}</span>
+          <span class="hidden md:inline">, {formatDay(latest.data.date)}</span>
+        </span>
+        <span aria-hidden="true" class:list={[divider, "hidden md:block"]} />
+        <span class="hidden font-bold whitespace-nowrap text-indigo-600 md:inline dark:text-indigo-400">
+          {typeset(HERO.changelogLink)}
+        </span>
+      </>
+    )
+  }
+  <svg
+    class="size-4 shrink-0 text-gray-400 transition-transform duration-200 group-hover:translate-x-0.5 dark:text-gray-500"
+    viewBox="0 0 20 20"
+    fill="currentColor"
+    aria-hidden="true"
+  >
+    <path
+      fill-rule="evenodd"
+      d="M3 10a.75.75 0 0 1 .75-.75h10.638L10.23 5.29a.75.75 0 1 1 1.04-1.08l5.5 5.25a.75.75 0 0 1 0 1.08l-5.5 5.25a.75.75 0 1 1-1.04-1.08l4.158-3.96H3.75A.75.75 0 0 1 3 10Z"
+      clip-rule="evenodd"></path>
+  </svg>
+</a>

@@ -1,18 +1,19 @@
 ---
 import { HERO } from "../constants";
 import CtaButtons from "./CtaButtons.astro";
+import ReleaseStatus from "./ReleaseStatus.astro";
 ---
 
-<section class="relative isolate overflow-hidden px-6 py-24 sm:py-32">
+<section class="relative isolate overflow-hidden px-6 pt-28 pb-24 sm:pt-32 sm:pb-32">
   <div aria-hidden="true" class="chart-grid absolute inset-0 -z-10"></div>
 
   <div class="mx-auto max-w-2xl text-center lg:max-w-3xl">
-    <p class="rise text-xs font-bold tracking-widest text-indigo-600 uppercase dark:text-indigo-400">
-      {HERO.eyebrow}
-    </p>
+    <div class="rise flex justify-center">
+      <ReleaseStatus />
+    </div>
 
     <h1
-      class="rise mt-6 text-4xl font-bold tracking-tight text-balance text-gray-900 sm:text-5xl lg:text-6xl dark:text-white"
+      class="rise mt-20 text-4xl font-bold tracking-tight sm:mt-28 text-balance text-gray-900 sm:text-5xl lg:text-6xl dark:text-white"
       style="--rise-delay: 80ms"
     >
       <span class="block">{HERO.heading.before}</span>

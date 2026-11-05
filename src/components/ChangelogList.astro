@@ -1,0 +1,146 @@
+---
+import { CHANGELOG } from "../constants";
+import { type ChangelogEntry as Entry, typeset } from "../lib/changelog";
+import ChangelogEntry from "./ChangelogEntry.astro";
+
+interface Props {
+  entries: Entry[];
+  page: number;
+  anchored: Set<string>;
+  next?: string;
+  versions?: [string, number][];
+}
+
+const { entries, page, anchored, next, versions } = Astro.props;
+---
+
+<div
+  data-changelog-entries
+  data-page={page}
+  data-versions={versions ? JSON.stringify(versions) : undefined}
+  class="border-b border-gray-200 dark:border-gray-800"
+>
+  {entries.map((entry) => <ChangelogEntry entry={entry} anchor={anchored.has(entry.id)} />)}
+</div>
+
+{
+  next && (
+    <nav data-changelog-pager aria-label={CHANGELOG.olderLabel} class="flex justify-center pt-12">
+      <a
+        href={next}
+        data-next
+        data-label={CHANGELOG.olderLabel}
+        data-loading={typeset(CHANGELOG.loadingLabel)}
+        class="inline-flex items-center justify-center rounded-lg border border-gray-300 bg-white px-5 py-2.5 text-sm font-bold text-gray-900 transition-colors duration-200 hover:bg-gray-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500 aria-busy:cursor-progress aria-busy:text-gray-500 dark:border-gray-700 dark:bg-gray-900 dark:text-white dark:hover:bg-gray-800 dark:aria-busy:text-gray-400"
+      >
+        {CHANGELOG.olderLabel}
+      </a>
+    </nav>
+  )
+}
+
+<p data-changelog-status data-loaded={CHANGELOG.loadedLabel} aria-live="polite" class="sr-only"></p>
+
+<script>
+  import { compareVersions, parseVersion } from "../lib/version";
+
+  const list = document.querySelector<HTMLElement>("[data-changelog-entries]");
+  const status = document.querySelector<HTMLElement>("[data-changelog-status]");
+  let pager = document.querySelector<HTMLElement>("[data-changelog-pager]");
+  let link = pager?.querySelector<HTMLAnchorElement>("a[data-next]") ?? null;
+  let loadedPage = Number(list?.dataset.page ?? "1");
+  let pending: Promise<boolean> | null = null;
+
+  const setBusy = (busy: boolean) => {
+    if (!link) return;
+    link.toggleAttribute("aria-busy", busy);
+    link.textContent = (busy ? link.dataset.loading : link.dataset.label) ?? link.textContent;
+  };
+
+  const loadMore = (): Promise<boolean> => {
+    if (!list || !link) return Promise.resolve(false);
+    if (pending) return pending;
+    const url = link.href;
+    setBusy(true);
+    pending = fetch(url)
+      .then((response) => {
+        if (!response.ok) throw new Error(`${response.status} ${url}`);
+        return response.text();
+      })
+      .then((html) => {
+        const page = new DOMParser().parseFromString(html, "text/html");
+        for (const article of page.querySelectorAll("[data-changelog-entries] > article")) list.append(article);
+        const following = page.querySelector<HTMLAnchorElement>("[data-changelog-pager] a[data-next]");
+        loadedPage += 1;
+        if (following && link) {
+          link.href = new URL(following.getAttribute("href") ?? "", url).href;
+        } else {
+          pager?.remove();
+          pager = null;
+          link = null;
+        }
+        if (status) status.textContent = status.dataset.loaded ?? "";
+        return true;
+      })
+      .catch(() => false)
+      .finally(() => {
+        pending = null;
+        setBusy(false);
+      });
+    return pending;
+  };
+
+  if (list && pager && link) {
+    link.addEventListener("click", (event) => {
+      event.preventDefault();
+      loadMore();
+    });
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (!entry.isIntersecting) return;
+        loadMore().then((loaded) => {
+          if (!loaded || !pager) {
+            observer.disconnect();
+            return;
+          }
+          observer.unobserve(pager);
+          observer.observe(pager);
+        });
+      },
+      { rootMargin: "0px 0px 1500px 0px" },
+    );
+    observer.observe(pager);
+  }
+
+  const versionFromHash = () => {
+    const match = /^#v(\d+\.\d+\.\d+)$/.exec(window.location.hash);
+    return match && !document.getElementById(`v${match[1]}`) ? match[1] : null;
+  };
+
+  const versions: [string, number][] = JSON.parse(list?.dataset.versions ?? "[]");
+
+  const reveal = async (requested: string) => {
+    if (!list || !parseVersion(requested) || versions.length === 0) return;
+    const [version, page] =
+      versions.find(([candidate]) => compareVersions(candidate, requested) <= 0) ?? versions[versions.length - 1];
+    let loaded = true;
+    while (loaded && loadedPage < page) loaded = await loadMore();
+    const article = list.querySelector<HTMLElement>(`article[data-version="${version}"]`);
+    if (!article) return;
+    for (const current of list.querySelectorAll<HTMLElement>("article[data-current]")) delete current.dataset.current;
+    article.dataset.current = "";
+    article.scrollIntoView({ block: "start" });
+  };
+
+  const initial = new URLSearchParams(window.location.search).get("version") ?? versionFromHash();
+  if (initial) {
+    history.scrollRestoration = "manual";
+    reveal(initial);
+  }
+
+  window.addEventListener("hashchange", () => {
+    const requested = versionFromHash();
+    if (requested) reveal(requested);
+  });
+</script>

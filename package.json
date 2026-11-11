@@ -2,7 +2,7 @@
   "name": "landing",
   "author": "mypreflight",
   "type": "module",
-  "version": "1.3.2",
+  "version": "1.3.3",
   "scripts": {
     "dev": "astro dev",
     "build": "astro build",

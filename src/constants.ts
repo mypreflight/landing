@@ -4,11 +4,15 @@ export const APP_URL = "https://app.mypreflight.io";
 export const DISCORD_URL = "https://discord.gg/YVatSsZQyw";
 export const APP_RELEASES_URL = "https://github.com/mypreflight/app/releases/tag";
 export const TRANSPONDER_RELEASES_URL = "https://github.com/mypreflight/transponder-app/releases/tag";
+export const TRANSPONDER_SOURCE_URL = "https://github.com/mypreflight/transponder-app";
+export const TRANSPONDER_DOWNLOAD_URL =
+  "https://github.com/mypreflight/transponder-app/releases/latest/download/mypreflight-transponder.exe";
 export const OWNER_NAME = "Oskar Barcz";
 export const OWNER_URL = "https://barcz.me";
 
 export const NAV = {
   homeLabel: "MyPreflight home",
+  transponderLabel: "Transponder",
   changelogLabel: "Changelog",
   themeLabel: "Switch theme",
   signInLabel: "Sign in",
@@ -255,6 +259,181 @@ export const CHANGELOGS = {
 
 export type ChangelogProduct = keyof typeof CHANGELOGS;
 
+export const TRANSPONDER = {
+  path: "/transponder",
+  markdownPath: "/transponder.html.md",
+  title: `Transponder for Windows, ${SITE_NAME}`,
+  description:
+    "Download the Transponder, the small Windows app that reports your aircraft from Microsoft Flight Simulator 2024 to MyPreflight and switches itself on at boarding and off at the gate.",
+  heading: "The window you leave open beside the sim.",
+  lead: "Six boxes, one job each. The Transponder reads your aircraft from Microsoft Flight Simulator 2024, reports it to MyPreflight, and switches itself on and off with your flight.",
+  file: "mypreflight-transponder.exe",
+  size: "110 MB",
+  platform: "Windows 10 and 11",
+  sim: "Microsoft Flight Simulator 2024",
+  downloadLabel: "Download for Windows",
+  versionLabel: "Version",
+  releaseNotesLabel: "What changed",
+  freeNote: "Free and open source",
+  checksumNote: "SHA-256 on every GitHub release",
+  sourceLabel: "Read the source",
+  consoleLabel:
+    "The Transponder's dashboard during boarding at Boston, gate B30. 1 Crew: Rick Doe. 2 Current service: AAL4908 from BOS to PHL, a B77W registered N720AN. 3 Transponder: simulator connected, squawk 2000, MODE C, last report 12:41:10Z. 4 Comms: Discord connected, presence on, Boarding, takeoff at 13:15 UTC. 5 Status: ADS-B, tracker and Transponder all OK. 6 Ground: catering done, refueling 9840 kg loaded, boarding 112 of 296 passengers, jetway docked.",
+  calloutsLabel: "What each box does",
+  callouts: [
+    {
+      key: "1",
+      title: "Who is signed in",
+      detail: "You approve a short code in your browser once. No password is typed here.",
+      href: "#setup",
+    },
+    {
+      key: "2",
+      title: "Your current flight",
+      detail: "Callsign, route and aircraft, read from the flight you started in MyPreflight.",
+      href: "#setup",
+    },
+    {
+      key: "3",
+      title: "The transponder itself",
+      detail: "MODE C from boarding, standby again from on-block.",
+      href: "#modes",
+    },
+    {
+      key: "4",
+      title: "Discord rich presence",
+      detail: "Your route and phase as your Discord activity, once you turn it on.",
+      href: "#integrations",
+    },
+    {
+      key: "5",
+      title: "Services and updates",
+      detail: "Both MyPreflight services checked, and a new version one key away.",
+      href: "#footprint",
+    },
+    {
+      key: "6",
+      title: "GSX ground services",
+      detail: "The turnaround, shown while GSX Pro works your aircraft.",
+      href: "#integrations",
+    },
+  ],
+  modes: {
+    id: "modes",
+    eyebrow: "Transponder mode",
+    heading: "It switches itself on at boarding and off at the gate.",
+    lead: "The Transponder follows your flight in MyPreflight. It starts in standby and sends nothing until boarding starts, then reports your position until you're on block.",
+    sentLabel: "Sent",
+    phases: [
+      { label: "Check-in", mode: "STBY", sent: "Nothing", weight: 1 },
+      { label: "Boarding", mode: "MODE C", sent: "Every 10 s", weight: 1 },
+      { label: "Taxi out", mode: "MODE C", sent: "Every 10 s", weight: 1 },
+      {
+        label: "Cruise",
+        mode: "MODE C",
+        sent: "Takeoff and touchdown the second they happen, every 30 s above 10,000 ft",
+        weight: 4,
+      },
+      { label: "Taxi in", mode: "MODE C", sent: "Every 10 s", weight: 1 },
+      { label: "Offboarding", mode: "STBY", sent: "Nothing", weight: 1 },
+    ],
+    note: "Start it mid-flight and it arms straight away. In between, press t to switch it by hand; it stays where you put it until the flight reaches the next edge.",
+  },
+  setup: {
+    id: "setup",
+    eyebrow: "Setup",
+    heading: "Setting it up takes one download and one code.",
+    lead: "No installer and nothing to configure. The callsign comes from the flight you start in MyPreflight, so the Transponder never transmits without one.",
+    steps: [
+      {
+        title: "Give it a folder",
+        detail: "Save mypreflight-transponder.exe into a folder of its own. Everything it writes stays there.",
+      },
+      {
+        title: "Start the sim",
+        detail: "Microsoft Flight Simulator 2024 first, and Discord too if you want rich presence.",
+      },
+      {
+        title: "Double-click it",
+        detail:
+          "The file isn't code-signed, so Windows may say it doesn't recognise the app. Choose More info, then Run anyway.",
+      },
+      {
+        title: "Approve the code",
+        detail:
+          "It opens MyPreflight in your browser. Check the code matches, then approve. The sign-in lasts 90 days from its last use.",
+      },
+      {
+        title: "Fly",
+        detail: "Start your flight in MyPreflight. The Transponder picks it up and arms itself when boarding starts.",
+      },
+    ],
+    consoleLabel:
+      "The Transponder asking you to sign in: open https://app.mypreflight.io/activate and check that the browser shows the code SFCD-NLVQ before you approve it.",
+  },
+  footprint: {
+    id: "footprint",
+    eyebrow: "Footprint",
+    heading: "It stays light on your sim PC and open to anyone who reads it.",
+    lead: "One file, no installer, nothing hidden. The source is public, and every release on GitHub lists its SHA-256.",
+    specs: [
+      { term: "Runs on", value: "Windows 10 and 11" },
+      { term: "Reads", value: "Microsoft Flight Simulator 2024" },
+      { term: "Download", value: "One .exe, 110 MB" },
+      { term: "Memory", value: "About 20 MB" },
+      { term: "Installs", value: "Nothing: no installer, nothing in %APPDATA% or the registry" },
+      {
+        term: "Writes",
+        value:
+          "Only into its own folder: your session, encrypted with Windows DPAPI, and a log capped at 5 MB plus one older copy",
+      },
+      { term: "Uninstall", value: "Delete its folder" },
+      {
+        term: "Updates",
+        value:
+          "Checks GitHub every 15 minutes. Press u to save the new version to Downloads, checksum verified. It never replaces itself while it runs.",
+      },
+      { term: "Licence", value: "Open source, under the Unlicense" },
+    ],
+    keysHeading: "Keys",
+    keys: [
+      { key: "s", action: "Sign in through the browser, or sign out" },
+      { key: "esc", action: "Stop waiting for a browser sign-in" },
+      { key: "t", action: "Switch between MODE C and STBY by hand" },
+      { key: "c", action: "Transmit under a callsign you type" },
+      { key: "r", action: "Read the current flight again" },
+      { key: "d", action: "Show the log" },
+      { key: "u", action: "Save a newer release to Downloads" },
+    ],
+  },
+  integrations: {
+    id: "integrations",
+    eyebrow: "GSX and Discord",
+    heading: "GSX and Discord join in when you use them.",
+    lead: "Neither is needed. Without GSX Pro, box 6 never appears, and rich presence stays off until you turn it on.",
+    items: [
+      {
+        key: "6",
+        title: "GSX Pro",
+        body: "While GSX works your aircraft, box 6 shows the stand and each service: passengers aboard, bags, holds and fuel. Turn on the GSX integration on your account page, and requesting boarding in GSX starts boarding in MyPreflight, while deboarding starts and then finishes offboarding. Nothing is ever sent to GSX.",
+        consoleLabel:
+          "Box 6, Ground, at Boston gate B30: catering done, refueling running with 9840 kg loaded, boarding running with 112 of 296 passengers aboard and bags at 40%, jetway done and docked.",
+      },
+      {
+        key: "4",
+        title: "Discord rich presence",
+        body: "With rich presence on, box 4 sets your Discord activity to your route and phase, so friends can see the flight you're on. It's off until you turn it on in MyPreflight, because it shows others what you're flying.",
+        consoleLabel:
+          "Boxes 3 and 4. Transponder: simulator connected, callsign AAL4908, squawk 2000, MODE C, last report 12:41:10Z. Comms: Discord connected, presence on, Boston (BOS) to Philadelphia (PHL), Boarding, takeoff at 13:15 UTC.",
+      },
+    ],
+  },
+  closing: {
+    heading: "Download it before your next boarding.",
+    lead: "Free, open source and one file. It tells you when there's a new version.",
+  },
+} as const;
+
 export const CLOSING_CTA = {
   heading: "We are building it now.",
   lead: "Launch is scheduled for late 2026. Come and help shape what the board becomes.",
@@ -277,6 +456,11 @@ export const LLMS = {
           label: "MyPreflight landing page",
           url: `${SITE_ORIGIN}/index.html.md`,
           note: "the whole site as plain markdown: what the board does, the four feature areas, how to get started, and the FAQ",
+        },
+        {
+          label: "MyPreflight Transponder",
+          url: `${SITE_ORIGIN}${TRANSPONDER.markdownPath}`,
+          note: "the Windows app that reports your aircraft from the simulator: what it does, how to set it up, its footprint and the download",
         },
         {
           label: "MyPreflight web app changelog",
@@ -310,6 +494,7 @@ export const FOOTER = {
       label: "Product",
       links: [
         { label: "Sign in", href: `${APP_URL}/sign-in`, external: true },
+        { label: "Transponder", href: TRANSPONDER.path, external: false },
         { label: "Changelog", href: CHANGELOGS.app.path, external: false },
         { label: "Discord", href: DISCORD_URL, external: true },
       ],

@@ -22,7 +22,8 @@ application itself lives in a separate repository (`flight-tracker-app`); this r
 site only. The product is flagged as in development in the hero, with launch scheduled for late
 2026.
 
-Routes: the marketing page at `/`, `/privacy`, `/terms`, two changelogs at `/changelog/app` and
+Routes: the marketing page at `/`, the Transponder's download page at `/transponder` (see
+"Transponder page" below), `/privacy`, `/terms`, two changelogs at `/changelog/app` and
 `/changelog/transponder` with one page per entry (see "Changelog" below), a `404`, and the generated
 text routes covered under "Machine-readable copies". There is no other page.
 
@@ -82,9 +83,10 @@ One thing is copied from the app on purpose and must stay in sync with it, and o
   serving a landing page. It is now this site's own: a floating dock, a rounded capsule 12 px below
   the top and 16 px wider than the content column on each side (`max-w-dock`, the `max-w-6xl`
   column plus `2rem`, with `px-2` on the header so the outset holds at every width). The logo, the
-  home link, sits alone on the left, aligned with the content's left edge; the Changelog link, the
-  theme toggle and a neutral Sign in button sit on the right, each 32 px tall and inset 8 px so the
-  corners stay concentric. Page content slides under it (`-mb-15` on the header), so every page's
+  home link, sits alone on the left, aligned with the content's left edge; below `sm` it shows the
+  mark without the wordmark text, so the dock fits a 390 px phone. The Transponder and Changelog
+  links, the theme toggle and a neutral Sign in button sit on the right, each 32 px tall and inset
+  8 px so the corners stay concentric. Page content slides under it (`-mb-15` on the header), so every page's
   first section pads its top by the dock's 60 px plus its usual spacing (`pt-36 sm:pt-44` on
   content pages).
   The dock never reloads: the site opts into cross-document view transitions (`@view-transition` in
@@ -151,6 +153,13 @@ The font is redistributed under the SIL Open Font License, so `public/fonts/OFL.
 alongside it. Do not swap in a system font stack: the app sets `--font-sans: "Noto Sans"` and the
 two must match.
 
+The Transponder's console is set in `public/fonts/console-mono.woff2` (`--font-console`), a 6.8 KB
+subset of Cascadia Mono, the Windows Terminal default, instanced at weight 400 and cut to printable
+ASCII plus the box-drawing and status glyphs the dashboard draws. Cascadia's OFL reserves the name
+"Cascadia Code", so the subset is renamed "MyPreflight Console Mono" and ships with
+`public/fonts/console-mono-OFL.txt`. If a new frame needs a glyph the subset lacks, cut a new subset
+from the same release with fontTools rather than loading the full 210 KB font.
+
 ## SEO and metadata
 
 `Layout.astro` owns the whole head. It takes `title`, `description` and an optional `robots`
@@ -178,12 +187,53 @@ files in `public/`.
 `## Optional` section has a defined meaning in the spec, namely links that may be skipped when a
 shorter context is needed. `index.html.md` is the spec's clean-markdown copy of the page, and is
 what `llms.txt` points at. Prose unique to these files lives in the `LLMS` constant.
+`/transponder.html.md` (`src/pages/transponder.html.md.ts`) is the same kind of copy of the
+Transponder page, built from the `TRANSPONDER` constant and also listed in `llms.txt`.
 
 Each changelog has two more: `/changelog/<product>.md` (`src/pages/changelog/[product].md.ts`), its
 clean-markdown copy listed in `llms.txt`, and `/changelog/<product>/feed.xml`, an Atom feed.
 `/changelog.md` and `/changelog/feed.xml` carry both changelogs together; they predate the split and
 stay so old links and feed subscriptions keep working. All of them are built by
 `src/lib/changelog-text.ts` from the entries, so adding an entry updates them.
+
+## Transponder page
+
+`/transponder` is the Transponder's download page, the one the knowledge base's launch checklist
+asks for. Its copy lives in the `TRANSPONDER` constant. It opens on the Transponder's real
+dashboard, drawn as live text by `Console.astro`, with the download on the console's title bar and
+six callouts keyed to the dashboard's own numbered boxes. Pointing at or focusing a callout rings
+its box, and pointing at a box lights its callout: plain CSS `:has()` rules at the end of
+`global.css`, positioned in `ch` and line-height units from the boxes `consoleBoxes()` finds in the
+frame. Each callout links to the section that explains it.
+
+Every console on the page renders at one 12 px cap (`console-compact`), sized to its own columns
+(`natural`), and reads as a physical screen: a pixel grille multiplied over it
+(`.console-screen::before`, one dark gap row per pixel and soft RGB subpixel columns, the pitch a
+quarter of the type size rounded to whole pixels), the text lifted 22% (`brightness(1.22)` on
+`.console-grid`) so the Campbell colours survive the grille, and a faint diagonal glare with a corner
+vignette on top (`.console-screen::after`). The hero console alone is `animated`: on load the panel
+fades up from black and the frame paints top to bottom one row at a time (`steps(var(--rows))`),
+then a faint refresh band sweeps down every 9 s, paused by an `IntersectionObserver` while the
+console is off screen. Reduced motion drops the row paint and the band.
+From `lg` up the hero console is tilted slightly in 3D (`console-tilt`), at the user's request and
+against the knowledge base's flat-surface rule; it turns flat while the pointer or keyboard focus is
+in the console stage, because a 3D transform softens text and the Download button sits on it. Keep
+the angle small. The GSX and Discord excerpts are full-width rows of the frame (`bandOf()`), so both
+render at the same width and box 4 keeps box 3 beside it, as on Windows.
+
+The console is not a screenshot. `src/data/transponder-console.json` holds the output of the
+1.5.4 release's own `renderFrame()` (and its sign-in screen), stored as rows of styled runs, and
+the page renders it in the Campbell palette Windows Terminal uses by default. The console stays
+black in both themes, as it is on Windows. Refresh the frame when a release changes the dashboard:
+build a `StatusRegistry` from that release tag the way its `src/presentation/tui/preview.ts` does,
+with the seeded pilot and AAL4908 boarding at Boston gate B30 with GSX running (so all six boxes
+show), render it at 88 columns, and store the runs. Never edit a run by hand.
+
+The Download button links to GitHub's latest-release download, so it always serves the newest
+build; the version printed beside it is the newest Transponder changelog entry's. The file size
+(`TRANSPONDER.size`) is typed in and is what Windows shows; update it when a release changes it.
+Every fact on the page comes from the Transponder's README and the knowledge base's
+`product/transponder.md`: check both before changing copy.
 
 ## Changelog
 

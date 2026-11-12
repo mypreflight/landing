@@ -1,5 +1,5 @@
 ---
-import { APP_URL, CHANGELOG, CHANGELOGS, NAV } from "../constants";
+import { APP_URL, CHANGELOG, CHANGELOGS, NAV, TRANSPONDER } from "../constants";
 import Mark from "./Mark.astro";
 
 const iconHigh =
@@ -10,6 +10,13 @@ const iconAuto =
   "M10.85 12.65h2.3L12 9zM20 8.69V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12zM14.3 16l-.7-2h-3.2l-.7 2H7.8L11 7h2l3.2 9z";
 
 const onChangelog = Astro.url.pathname.startsWith(CHANGELOG.path);
+const onTransponder = Astro.url.pathname.startsWith(TRANSPONDER.path);
+const itemClass = (current: boolean) => [
+  "flex h-8 items-center rounded-lg px-2.5 text-sm font-semibold whitespace-nowrap transition-colors duration-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500 sm:px-3",
+  current
+    ? "text-gray-900 group-data-static/dock:bg-gray-900/5 dark:text-white dark:group-data-static/dock:bg-white/10"
+    : "text-gray-600 hover:text-gray-900 group-data-static/dock:hover:bg-gray-900/5 dark:text-gray-300 dark:hover:text-white dark:group-data-static/dock:hover:bg-white/10",
+];
 ---
 
 <header id="site-header" data-scrolled="false" class="group sticky top-0 z-50 -mb-15 px-2 pt-3">
@@ -23,8 +30,8 @@ const onChangelog = Astro.url.pathname.startsWith(CHANGELOG.path);
       aria-label={NAV.homeLabel}
       class="flex shrink-0 items-center rounded-lg focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
     >
-      <Mark class="me-2 h-5 w-auto text-indigo-500" />
-      <span class="text-base font-normal whitespace-nowrap text-indigo-500 dark:text-indigo-400">
+      <Mark class="h-5 w-auto text-indigo-500 sm:me-2" />
+      <span class="hidden text-base font-normal whitespace-nowrap text-indigo-500 sm:inline dark:text-indigo-400">
         my<span class="font-bold">preflight</span>
       </span>
     </a>
@@ -37,14 +44,17 @@ const onChangelog = Astro.url.pathname.startsWith(CHANGELOG.path);
       ></span>
       <a
         data-dock-item
+        href={TRANSPONDER.path}
+        aria-current={onTransponder ? "page" : undefined}
+        class:list={itemClass(onTransponder)}
+      >
+        {NAV.transponderLabel}
+      </a>
+      <a
+        data-dock-item
         href={CHANGELOGS.app.path}
         aria-current={onChangelog ? "page" : undefined}
-        class:list={[
-          "flex h-8 items-center rounded-lg px-2.5 text-sm font-semibold whitespace-nowrap transition-colors duration-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500 sm:px-3",
-          onChangelog
-            ? "text-gray-900 group-data-static/dock:bg-gray-900/5 dark:text-white dark:group-data-static/dock:bg-white/10"
-            : "text-gray-600 hover:text-gray-900 group-data-static/dock:hover:bg-gray-900/5 dark:text-gray-300 dark:hover:text-white dark:group-data-static/dock:hover:bg-white/10",
-        ]}
+        class:list={itemClass(onChangelog)}
       >
         {NAV.changelogLabel}
       </a>

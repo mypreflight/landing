@@ -1,0 +1,67 @@
+---
+import type { ConsoleBox, ConsoleFrame } from "../lib/console";
+
+interface Props {
+  frame: ConsoleFrame;
+  label: string;
+  boxes?: ConsoleBox[];
+  links?: Record<string, string>;
+  natural?: boolean;
+  animated?: boolean;
+  class?: string;
+}
+
+const { frame, label, boxes = [], links = {}, natural = false, animated = false, class: className } = Astro.props;
+const styleClass = (style?: string) =>
+  style
+    ?.split(" ")
+    .map((token) => `console-${token}`)
+    .join(" ");
+---
+
+<div
+  class:list={["console-room", natural && "console-natural", className]}
+  style={`--columns: ${frame.columns}; --rows: ${frame.rows.length}`}
+>
+  <figure class="console" data-animated={animated ? "" : undefined}>
+    {
+      Astro.slots.has("bar") && (
+        <div class="console-bar">
+          <slot name="bar" />
+        </div>
+      )
+    }
+    <div class="console-screen">
+      <div class="console-grid">
+        <pre role="img" aria-label={label}>{frame.rows.map((row) => <span class="console-row">{row.map(([text, style]) => (style ? <span class={styleClass(style)}>{text}</span> : text))}</span>)}</pre>
+        {
+          boxes.map((box) => (
+            <a
+              href={links[box.key]}
+              data-key={box.key}
+              tabindex="-1"
+              aria-hidden="true"
+              class="console-box"
+              style={`--row: ${box.row}; --column: ${box.column}; --width: ${box.width}; --height: ${box.height}`}
+            />
+          ))
+        }
+      </div>
+      {animated && <div class="console-sweep" aria-hidden="true" />}
+    </div>
+  </figure>
+</div>
+
+<script>
+  const animated = document.querySelectorAll<HTMLElement>(".console[data-animated]");
+
+  if (animated.length > 0) {
+    const observer = new IntersectionObserver((entries) => {
+      for (const entry of entries) {
+        entry.target.toggleAttribute("data-offscreen", !entry.isIntersecting);
+      }
+    });
+
+    for (const element of animated) observer.observe(element);
+  }
+</script>

@@ -1,6 +1,6 @@
 ---
 title: "See where every finished flight went, minute by minute"
-date: 2026-11-12T12:00:00Z
+date: 2026-11-12T10:20:24Z
 version: "2.128.0"
 area: "Flight tracking"
 summary: "Flight history opens a finished flight on its map: the track you flew over the filed route, each block time against schedule, fuel burned against the planned trip, and a vertical profile of altitude and ground speed against the planned altitude. Documents holds the briefing you flew it on."

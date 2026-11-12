@@ -1,27 +1,32 @@
 ---
 interface Props {
+  id?: string;
   index?: string;
   eyebrow: string;
   heading: string;
   lead: string;
   reverse?: boolean;
+  wide?: boolean;
 }
 
-const { index, eyebrow, heading, lead, reverse = false } = Astro.props;
+const { id, index, eyebrow, heading, lead, reverse = false, wide = false } = Astro.props;
 const hasVisual = Astro.slots.has("default");
+const split = hasVisual && !wide;
 ---
 
-<section class="px-6 py-20 sm:py-28">
+<section id={id} class="scroll-mt-24 px-6 py-20 sm:py-28">
   <div
     class:list={[
       "mx-auto max-w-6xl",
-      hasVisual && "flex flex-col gap-10 lg:grid lg:grid-cols-2 lg:items-center lg:gap-16",
+      split && "flex flex-col gap-10 lg:grid lg:grid-cols-2 lg:items-center lg:gap-16",
     ]}
   >
     <div
       class:list={[
         "rise",
-        hasVisual ? "lg:max-w-lg" : "mx-auto max-w-2xl text-center",
+        split && "lg:max-w-lg",
+        wide && "max-w-2xl",
+        !hasVisual && "mx-auto max-w-2xl text-center",
         reverse && "lg:order-2 lg:justify-self-end",
       ]}
     >
@@ -42,7 +47,7 @@ const hasVisual = Astro.slots.has("default");
 
     {
       hasVisual && (
-        <div class:list={["rise", reverse && "lg:order-1"]} style="--rise-delay: 120ms">
+        <div class:list={["rise", reverse && "lg:order-1", wide && "mt-12"]} style="--rise-delay: 120ms">
           <slot />
         </div>
       )

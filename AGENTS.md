@@ -22,9 +22,10 @@ application itself lives in a separate repository (`flight-tracker-app`); this r
 site only. The product is flagged as in development in the hero, with launch scheduled for late
 2026.
 
-Routes: the marketing page at `/`, `/privacy`, `/terms`, the changelog at `/changelog` with one
-page per entry (see "Changelog" below), a `404`, and the generated text routes covered under
-"Machine-readable copies". There is no other page.
+Routes: the marketing page at `/`, the Transponder's download page at `/transponder` (see
+"Transponder page" below), `/privacy`, `/terms`, two changelogs at `/changelog/app` and
+`/changelog/transponder` with one page per entry (see "Changelog" below), a `404`, and the generated
+text routes covered under "Machine-readable copies". There is no other page.
 
 - **Framework**: Astro 7, static output, **no UI framework** — no React, no islands. Interactivity
   is plain `<script>` in `.astro` files. Keep it that way unless the user explicitly asks otherwise.
@@ -82,9 +83,10 @@ One thing is copied from the app on purpose and must stay in sync with it, and o
   serving a landing page. It is now this site's own: a floating dock, a rounded capsule 12 px below
   the top and 16 px wider than the content column on each side (`max-w-dock`, the `max-w-6xl`
   column plus `2rem`, with `px-2` on the header so the outset holds at every width). The logo, the
-  home link, sits alone on the left, aligned with the content's left edge; the Changelog link, the
-  theme toggle and a neutral Sign in button sit on the right, each 32 px tall and inset 8 px so the
-  corners stay concentric. Page content slides under it (`-mb-15` on the header), so every page's
+  home link, sits alone on the left, aligned with the content's left edge; below `sm` it shows the
+  mark without the wordmark text, so the dock fits a 390 px phone. The Transponder and Changelog
+  links, the theme toggle and a neutral Sign in button sit on the right, each 32 px tall and inset
+  8 px so the corners stay concentric. Page content slides under it (`-mb-15` on the header), so every page's
   first section pads its top by the dock's 60 px plus its usual spacing (`pt-36 sm:pt-44` on
   content pages).
   The dock never reloads: the site opts into cross-document view transitions (`@view-transition` in
@@ -151,6 +153,13 @@ The font is redistributed under the SIL Open Font License, so `public/fonts/OFL.
 alongside it. Do not swap in a system font stack: the app sets `--font-sans: "Noto Sans"` and the
 two must match.
 
+The Transponder's console is set in `public/fonts/console-mono.woff2` (`--font-console`), a 6.8 KB
+subset of Cascadia Mono, the Windows Terminal default, instanced at weight 400 and cut to printable
+ASCII plus the box-drawing and status glyphs the dashboard draws. Cascadia's OFL reserves the name
+"Cascadia Code", so the subset is renamed "MyPreflight Console Mono" and ships with
+`public/fonts/console-mono-OFL.txt`. If a new frame needs a glyph the subset lacks, cut a new subset
+from the same release with fontTools rather than loading the full 210 KB font.
+
 ## SEO and metadata
 
 `Layout.astro` owns the whole head. It takes `title`, `description` and an optional `robots`
@@ -178,54 +187,113 @@ files in `public/`.
 `## Optional` section has a defined meaning in the spec, namely links that may be skipped when a
 shorter context is needed. `index.html.md` is the spec's clean-markdown copy of the page, and is
 what `llms.txt` points at. Prose unique to these files lives in the `LLMS` constant.
+`/transponder.html.md` (`src/pages/transponder.html.md.ts`) is the same kind of copy of the
+Transponder page, built from the `TRANSPONDER` constant and also listed in `llms.txt`.
 
-The changelog has two more: `/changelog.md` (`src/pages/changelog.md.ts`), its clean-markdown copy
-listed in `llms.txt`, and `/changelog/feed.xml` (`src/pages/changelog/feed.xml.ts`), an Atom feed.
-Both are generated from the entries, so adding an entry updates them.
+Each changelog has two more: `/changelog/<product>.md` (`src/pages/changelog/[product].md.ts`), its
+clean-markdown copy listed in `llms.txt`, and `/changelog/<product>/feed.xml`, an Atom feed.
+`/changelog.md` and `/changelog/feed.xml` carry both changelogs together; they predate the split and
+stay so old links and feed subscriptions keep working. All of them are built by
+`src/lib/changelog-text.ts` from the entries, so adding an entry updates them.
+
+## Transponder page
+
+`/transponder` is the Transponder's download page, the one the knowledge base's launch checklist
+asks for. Its copy lives in the `TRANSPONDER` constant. It opens on the Transponder's real
+dashboard, drawn as live text by `Console.astro`, with the download on the console's title bar and
+six callouts keyed to the dashboard's own numbered boxes. Pointing at or focusing a callout rings
+its box, and pointing at a box lights its callout: plain CSS `:has()` rules at the end of
+`global.css`, positioned in `ch` and line-height units from the boxes `consoleBoxes()` finds in the
+frame. Each callout links to the section that explains it.
+
+Every console on the page renders at one 12 px cap (`console-compact`), sized to its own columns
+(`natural`), and reads as a physical screen: a pixel grille multiplied over it
+(`.console-screen::before`, one dark gap row per pixel and soft RGB subpixel columns, the pitch a
+quarter of the type size rounded to whole pixels), the text lifted 22% (`brightness(1.22)` on
+`.console-grid`) so the Campbell colours survive the grille, and a faint diagonal glare with a corner
+vignette on top (`.console-screen::after`). The hero console alone is `animated`: on load the panel
+fades up from black and the frame paints top to bottom one row at a time (`steps(var(--rows))`),
+then a faint refresh band sweeps down every 9 s, paused by an `IntersectionObserver` while the
+console is off screen. Reduced motion drops the row paint and the band.
+From `lg` up the hero console is tilted slightly in 3D (`console-tilt`), at the user's request and
+against the knowledge base's flat-surface rule; it turns flat while the pointer or keyboard focus is
+in the console stage, because a 3D transform softens text and the Download button sits on it. Keep
+the angle small. The GSX and Discord excerpts are full-width rows of the frame (`bandOf()`), so both
+render at the same width and box 4 keeps box 3 beside it, as on Windows.
+
+The console is not a screenshot. `src/data/transponder-console.json` holds the output of the
+1.5.4 release's own `renderFrame()` (and its sign-in screen), stored as rows of styled runs, and
+the page renders it in the Campbell palette Windows Terminal uses by default. The console stays
+black in both themes, as it is on Windows. Refresh the frame when a release changes the dashboard:
+build a `StatusRegistry` from that release tag the way its `src/presentation/tui/preview.ts` does,
+with the seeded pilot and AAL4908 boarding at Boston gate B30 with GSX running (so all six boxes
+show), render it at 88 columns, and store the runs. Never edit a run by hand.
+
+The Download button links to GitHub's latest-release download, so it always serves the newest
+build; the version printed beside it is the newest Transponder changelog entry's. The file size
+(`TRANSPONDER.size`) is typed in and is what Windows shows; update it when a release changes it.
+Every fact on the page comes from the Transponder's README and the knowledge base's
+`product/transponder.md`: check both before changing copy.
 
 ## Changelog
 
-`/changelog` lists every change a pilot will notice, newest first and grouped by UTC day. Each entry
-also has its own page at `/changelog/<folder>`, with links to the entries either side of it.
+There are two changelogs, one per thing a pilot runs: the web app at `/changelog/app` and the
+Transponder at `/changelog/transponder`. Each lists every change a pilot will notice in it, newest
+first and grouped by UTC day, and each entry has its own page at `/changelog/<product>/<folder>`,
+with links to the entries either side of it in the same changelog. `CHANGELOGS` in
+`src/constants.ts` holds what differs between them: name, paths, lead, release URL and areas. A
+switch under the heading, `ChangelogSwitch.astro`, moves between the two and shows each one's newest
+version.
+
+The changelog used to be the web app's alone, at `/changelog`. `/changelog/` now forwards to
+`/changelog/app/`, keeping the query and the hash, and the entries and pages published before the
+split redirect from their old addresses (`appChangelogBeforeSplit` in `astro.config.mjs`). That list
+is frozen: never add to it.
 
 **Every shipped feature or noticeable fix gets an entry, in a PR to this repo opened as part of the
 work that ships it.** The app, API and Transponder `AGENTS.md` files point here. Open it as a draft
 until the code it describes is merged. Only features marked **Live** in the knowledge base's feature
-catalogue get an entry; Partial and Planned ones wait.
+catalogue get an entry; Partial and Planned ones wait. A change in the app or the API goes in the web
+app changelog, a change in the Transponder in the Transponder's. When one feature ships in both, each
+changelog gets an entry for its own side, and each body links to the other.
 
-An entry is a folder in `src/content/changelog/` named `YYYY-MM-DD-<slug>` after the UTC day the
-change merged, holding `index.md` and its screenshots. The folder name is the URL, so never rename
-one once it's published. `src/content.config.ts` validates the frontmatter at build time:
+An entry is a folder in `src/content/changelog/<product>/` named `YYYY-MM-DD-<slug>` after the UTC
+day the change merged, holding `index.md` and its screenshots. The folder name is the URL, so never
+rename one once it's published. `src/content.config.ts` validates the frontmatter at build time:
 
 | Field      | What goes in it                                                                      |
 | :--------- | :----------------------------------------------------------------------------------- |
 | `title`    | A claim in a full sentence, without a full stop at the end, at most 60 characters    |
 | `date`     | The merge time in UTC, e.g. `2026-11-03T10:31:52Z`; it orders entries within a day    |
-| `version`  | The web app version current once the change is live, e.g. `2.124.0`; see below       |
-| `area`     | One of `CHANGELOG.areas` in `src/constants.ts`                                       |
+| `version`  | The product's version once the change is live: `2.124.0` (app), `1.5.4` (Transponder) |
+| `area`     | One of that changelog's `areas` in `CHANGELOGS`, `src/constants.ts`                  |
 | `summary`  | What changed, for whom, in at most 320 characters                                    |
 | `figures`  | Optional; each has an `after` shot and, when an existing screen changed, a `before` |
 | `footnote` | Optional; only when a shot shows a value typed for it or a cancelled dialog          |
 
 Each entry leads with its version in the left margin, then the date and a "See on GitHub" link to
-that release. The area is a badge under the title. The release link uses `APP_RELEASES_URL` in
-`src/constants.ts`; the app tags releases with the bare version. The hero opens with one status line, `ReleaseStatus.astro`: in development, the
-newest entry's version and date, and a link to the changelog. It never animates.
+that release. The area is a badge under the title. The release link uses the changelog's
+`releasesUrl`; the app and the Transponder both tag releases with the bare version. The hero opens
+with one status line, `ReleaseStatus.astro`: in development, the newest web app entry's version and
+date, and a link to its changelog. It never animates.
 
 The index renders the newest `CHANGELOG.pageSize` entries (five); older ones live on
-`/changelog/page/<n>/`, each a complete page ending in an "Older changes" link, so the changelog
+`/changelog/<product>/page/<n>/`, each a complete page ending in an "Older changes" link, so it
 works without JavaScript. With it, `ChangelogList.astro` fetches the next page when the reader is
 about 1,500 px from the bottom, or on that link, and appends its entries in place. The index also
 carries every version's page number, so a version link to an older entry loads pages until it
-reaches it. The homepage's closing section links here as "See recent development updates".
+reaches it. The navbar, the footer and the homepage's closing section ("See recent development
+updates") link to the web app changelog.
 
-**The version is a contract with the app.** The app links to
-`https://mypreflight.io/changelog/?version=<its own version>`, and the index page scrolls to the
-newest entry at or below that version and marks it "Latest in your version". Any version works,
-including patch releases without an entry and releases newer than the last landing build. Each
-version's first entry also carries a `#v<version>` anchor. For an app change, pin the version that
-PR released. For an API or Transponder change, pin the app version that was live when it shipped.
-Versions must never go backwards in date order; `getChangelog()` fails the build if one does.
+**The version is a contract with each product.** The app links to
+`https://mypreflight.io/changelog/app/?version=<its own version>` (the old `/changelog/?version=`
+still lands there), and the Transponder can do the same with `/changelog/transponder/?version=`. The
+index page scrolls to the newest entry at or below that version and marks it "Latest in your
+version". Any version works, including patch releases without an entry and releases newer than the
+last landing build. Each version's first entry also carries a `#v<version>` anchor. For an app
+change, pin the version that PR released; for an API change, the app version that was live when it
+shipped; for a Transponder change, the Transponder version that release tagged. Versions must never
+go backwards in date order within a changelog; `getChangelog()` fails the build if one does.
 
 A shot has `light`, an optional `dark`, an `alt` describing what the screen shows and an optional
 one-sentence `caption`. A figure with a `before` renders a Before / After switch that swaps the two
@@ -251,6 +319,17 @@ the same seeded data at 1440x900 and device scale 2, with the same clock, crop a
 and dark. `Compare.astro` renders each image at half its pixel size, capped to the column (about
 850 px), so prefer component crops and keep whole views for layout changes. Commit AVIF, not PNG:
 `avifenc -q 72 -y 444 -s 4 in.png out.avif`.
+
+Transponder shots are renders of its console, made from the release itself. Check out the release
+tag, build a `StatusRegistry` holding the state the shot needs, the way
+`src/presentation/tui/preview.ts` does, and pass it to that tag's own `renderFrame()`, or for a
+sign-in screen to its `ConsolePrompt`, so every character on screen comes from the shipped code.
+Draw the ANSI output the way Windows Terminal does by default: Cascadia Mono at 15 px and its
+natural line height, the Campbell palette (background `#0c0c0c`, text `#cccccc`, bold as the bright
+colour, faint at half intensity), 88 columns, 14 px by 16 px of padding, on a page the colour of the
+background, captured at device scale 2. Before and after share one row count. Use the seeded pilot,
+AAL4908 (checked in, Boston to Philadelphia) or AAL4912 (in cruise), and the API and ADS-B receiver
+versions that were live at the time. The console has one theme, so these shots have `light` only.
 
 ## Code style
 

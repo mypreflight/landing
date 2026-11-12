@@ -1,0 +1,76 @@
+---
+import ChangelogList from "../../../../components/ChangelogList.astro";
+import { CHANGELOG, CHANGELOGS, type ChangelogProduct } from "../../../../constants";
+import Layout from "../../../../layouts/Layout.astro";
+import {
+  type ChangelogEntry,
+  firstOfVersion,
+  getChangelog,
+  PRODUCTS,
+  pagePath,
+  toPages,
+} from "../../../../lib/changelog";
+
+export async function getStaticPaths() {
+  const routes = await Promise.all(
+    PRODUCTS.map(async (product) => {
+      const entries = await getChangelog(product);
+      const pages = toPages(entries);
+      const anchored = firstOfVersion(entries);
+      return pages.slice(1).map((pageEntries, index) => {
+        const page = index + 2;
+        return {
+          params: { product, page: String(page) },
+          props: {
+            product,
+            entries: pageEntries,
+            page,
+            anchored,
+            next: page < pages.length ? pagePath(product, page + 1) : undefined,
+          },
+        };
+      });
+    }),
+  );
+  return routes.flat();
+}
+
+interface Props {
+  product: ChangelogProduct;
+  entries: ChangelogEntry[];
+  page: number;
+  anchored: Set<string>;
+  next?: string;
+}
+
+const { product, entries, page, anchored, next } = Astro.props;
+const changelog = CHANGELOGS[product];
+---
+
+<Layout title={`${CHANGELOG.olderLabel}, page ${page}, ${changelog.longTitle}`} description={changelog.description}>
+  <link slot="head" rel="alternate" type="application/atom+xml" href={changelog.feedPath} title={changelog.longTitle} />
+
+  <main class="changelog flex-1 px-6 pt-36 pb-20 sm:pt-44 sm:pb-28">
+    <div class="mx-auto max-w-6xl">
+      <header class="pb-12 sm:pb-16">
+        <a
+          href={pagePath(product, 1)}
+          class="inline-flex items-center gap-1.5 text-sm font-bold text-gray-500 transition-colors duration-200 hover:text-indigo-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500 dark:text-gray-400 dark:hover:text-indigo-400"
+        >
+          <svg class="size-4" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+            <path
+              fill-rule="evenodd"
+              d="M17 10a.75.75 0 0 1-.75.75H5.612l4.158 3.96a.75.75 0 1 1-1.04 1.08l-5.5-5.25a.75.75 0 0 1 0-1.08l5.5-5.25a.75.75 0 1 1 1.04 1.08L5.612 9.25H16.25A.75.75 0 0 1 17 10Z"
+              clip-rule="evenodd"></path>
+          </svg>
+          {CHANGELOG.latestLabel}
+        </a>
+        <h1 class="mt-6 text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl dark:text-white">
+          {CHANGELOG.olderLabel}<span class="sr-only">, {changelog.name}</span>
+        </h1>
+      </header>
+
+      <ChangelogList entries={entries} page={page} anchored={anchored} next={next} />
+    </div>
+  </main>
+</Layout>

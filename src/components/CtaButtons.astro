@@ -1,5 +1,5 @@
 ---
-import { CHANGELOG, CTA_CHANGELOG_LABEL, CTA_DISCORD_LABEL, DISCORD_URL } from "../constants";
+import { CHANGELOGS, CTA_CHANGELOG_LABEL, CTA_DISCORD_LABEL, DISCORD_URL } from "../constants";
 import DiscordIcon from "./DiscordIcon.astro";
 
 interface Props {
@@ -26,7 +26,7 @@ const button =
   {
     changelog && (
       <a
-        href={CHANGELOG.path}
+        href={CHANGELOGS.app.path}
         class:list={[
           button,
           "border border-gray-300 bg-white text-gray-900 hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-900 dark:text-white dark:hover:bg-gray-800",

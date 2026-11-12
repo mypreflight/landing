@@ -1,13 +1,13 @@
 ---
-import { CHANGELOG, HERO } from "../constants";
+import { CHANGELOGS, HERO } from "../constants";
 import { formatDay, getChangelog, typeset } from "../lib/changelog";
 
-const [latest] = await getChangelog();
+const [latest] = await getChangelog("app");
 const divider = "h-4 w-px shrink-0 bg-gray-200 dark:bg-gray-700";
 ---
 
 <a
-  href={CHANGELOG.path}
+  href={CHANGELOGS.app.path}
   class="group inline-flex max-w-full items-center gap-3 rounded-full border border-gray-200 bg-white py-1.5 ps-3.5 pe-3 text-sm text-gray-600 shadow-xs transition-colors duration-200 hover:border-gray-300 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500 dark:border-gray-800 dark:bg-gray-900 dark:text-gray-300 dark:hover:border-gray-700"
 >
   <span class="inline-flex shrink-0 items-center gap-2 font-bold text-gray-900 dark:text-white">

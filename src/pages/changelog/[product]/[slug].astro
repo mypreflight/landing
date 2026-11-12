@@ -1,25 +1,39 @@
 ---
-import ChangelogEntry from "../../components/ChangelogEntry.astro";
-import { CHANGELOG, SITE_NAME } from "../../constants";
-import Layout from "../../layouts/Layout.astro";
-import { type ChangelogEntry as Entry, entryPath, getChangelog, typeset } from "../../lib/changelog";
+import ChangelogEntry from "../../../components/ChangelogEntry.astro";
+import { CHANGELOG, CHANGELOGS, type ChangelogProduct } from "../../../constants";
+import Layout from "../../../layouts/Layout.astro";
+import {
+  type ChangelogEntry as Entry,
+  entryPath,
+  getChangelog,
+  PRODUCTS,
+  pagePath,
+  typeset,
+} from "../../../lib/changelog";
 
 export async function getStaticPaths() {
-  const entries = await getChangelog();
-  return entries.map((entry, index) => ({
-    params: { slug: entry.id },
-    props: { entry, later: entries[index - 1], earlier: entries[index + 1] },
-  }));
+  const routes = await Promise.all(
+    PRODUCTS.map(async (product) => {
+      const entries = await getChangelog(product);
+      return entries.map((entry, index) => ({
+        params: { product, slug: entry.id },
+        props: { product, entry, later: entries[index - 1], earlier: entries[index + 1] },
+      }));
+    }),
+  );
+  return routes.flat();
 }
 
 interface Props {
+  product: ChangelogProduct;
   entry: Entry;
   later?: Entry;
   earlier?: Entry;
 }
 
-const { entry, later, earlier } = Astro.props;
-const title = `${typeset(entry.data.title)}, ${SITE_NAME} changelog`;
+const { product, entry, later, earlier } = Astro.props;
+const changelog = CHANGELOGS[product];
+const title = `${typeset(entry.data.title)}, ${changelog.longTitle}`;
 const neighbours = [
   { label: CHANGELOG.earlierLabel, entry: earlier },
   { label: CHANGELOG.laterLabel, entry: later },
@@ -27,12 +41,12 @@ const neighbours = [
 ---
 
 <Layout title={title} description={typeset(entry.data.summary)}>
-  <link slot="head" rel="alternate" type="application/atom+xml" href={CHANGELOG.feedPath} title={`${SITE_NAME} changelog`} />
+  <link slot="head" rel="alternate" type="application/atom+xml" href={changelog.feedPath} title={changelog.longTitle} />
 
   <main class="changelog flex-1 px-6 pt-36 pb-20 sm:pt-44 sm:pb-28">
     <div class="mx-auto max-w-6xl">
       <a
-        href={CHANGELOG.path}
+        href={pagePath(product, 1)}
         class="inline-flex items-center gap-1.5 text-sm font-bold text-gray-500 transition-colors duration-200 hover:text-indigo-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500 dark:text-gray-400 dark:hover:text-indigo-400"
       >
         <svg class="size-4" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
@@ -41,7 +55,7 @@ const neighbours = [
             d="M17 10a.75.75 0 0 1-.75.75H5.612l4.158 3.96a.75.75 0 1 1-1.04 1.08l-5.5-5.25a.75.75 0 0 1 0-1.08l5.5-5.25a.75.75 0 1 1 1.04 1.08L5.612 9.25H16.25A.75.75 0 0 1 17 10Z"
             clip-rule="evenodd"></path>
         </svg>
-        {CHANGELOG.backLabel}
+        {changelog.name} {CHANGELOG.heading.toLowerCase()}
       </a>
 
       <ChangelogEntry entry={entry} level="h1" anchor divided={false} />

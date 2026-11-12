@@ -1,0 +1,46 @@
+---
+import { CHANGELOG, CHANGELOGS, type ChangelogProduct } from "../constants";
+import { getChangelog, PRODUCTS, pagePath } from "../lib/changelog";
+
+interface Props {
+  current: ChangelogProduct;
+  class?: string;
+}
+
+const { current, class: className } = Astro.props;
+
+const products = await Promise.all(
+  PRODUCTS.map(async (product) => ({ product, latest: (await getChangelog(product))[0] })),
+);
+---
+
+<nav
+  aria-label={CHANGELOG.switchLabel}
+  class:list={[
+    "inline-flex max-w-full gap-1 rounded-xl border border-gray-200 bg-white p-1 shadow-xs dark:border-gray-800 dark:bg-gray-900",
+    className,
+  ]}
+>
+  {
+    products.map(({ product, latest }) => (
+      <a
+        href={pagePath(product, 1)}
+        aria-current={product === current ? "page" : undefined}
+        class:list={[
+          "flex h-9 items-center gap-2 rounded-lg px-3.5 text-sm font-bold whitespace-nowrap transition-colors duration-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500",
+          product === current
+            ? "bg-gray-900/5 text-gray-900 dark:bg-white/10 dark:text-white"
+            : "text-gray-600 hover:bg-gray-900/5 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-white/10 dark:hover:text-white",
+        ]}
+      >
+        {CHANGELOGS[product].name}
+        {latest && (
+          <span class="font-normal text-gray-500 tabular-nums dark:text-gray-400">
+            <span class="sr-only">, {CHANGELOG.versionLabel.toLowerCase()} </span>
+            {latest.data.version}
+          </span>
+        )}
+      </a>
+    ))
+  }
+</nav>

@@ -1,8 +1,14 @@
 import { type CollectionEntry, getCollection } from "astro:content";
-import { APP_RELEASES_URL, CHANGELOG } from "../constants";
+import { CHANGELOG, CHANGELOGS, type ChangelogProduct } from "../constants";
 import { compareVersions } from "./version";
 
-export type ChangelogEntry = CollectionEntry<"changelog">;
+const COLLECTIONS = { app: "appChangelog", transponder: "transponderChangelog" } as const;
+
+type ChangelogCollection = (typeof COLLECTIONS)[ChangelogProduct];
+
+export type ChangelogEntry = CollectionEntry<ChangelogCollection>;
+
+export const PRODUCTS = Object.keys(CHANGELOGS) as ChangelogProduct[];
 
 export interface ChangelogDay {
   key: string;
@@ -30,22 +36,34 @@ export const typeset = (text: string): string =>
 
 export const versionAnchor = (version: string): string => `v${version}`;
 
-export const releaseUrl = (version: string): string => `${APP_RELEASES_URL}/${version}`;
+const PRODUCT_OF: Record<ChangelogCollection, ChangelogProduct> = {
+  appChangelog: "app",
+  transponderChangelog: "transponder",
+};
 
-export const getChangelog = async (): Promise<ChangelogEntry[]> => {
-  const entries = (await getCollection("changelog")).sort(
-    (a, b) => b.data.date.getTime() - a.data.date.getTime() || b.id.localeCompare(a.id),
-  );
+export const productOf = (entry: ChangelogEntry): ChangelogProduct => PRODUCT_OF[entry.collection];
+
+export const releaseUrl = (entry: ChangelogEntry): string =>
+  `${CHANGELOGS[productOf(entry)].releasesUrl}/${entry.data.version}`;
+
+const byNewest = (a: ChangelogEntry, b: ChangelogEntry): number =>
+  b.data.date.getTime() - a.data.date.getTime() || b.id.localeCompare(a.id);
+
+export const getChangelog = async (product: ChangelogProduct): Promise<ChangelogEntry[]> => {
+  const entries: ChangelogEntry[] = (await getCollection(COLLECTIONS[product])).sort(byNewest);
   entries.forEach((entry, index) => {
     const older = entries[index + 1];
     if (older && compareVersions(entry.data.version, older.data.version) < 0) {
       throw new Error(
-        `Changelog entry ${entry.id} is pinned to ${entry.data.version}, older than ${older.id} (${older.data.version}). Versions must not go backwards in date order.`,
+        `${CHANGELOGS[product].name} changelog entry ${entry.id} is pinned to ${entry.data.version}, older than ${older.id} (${older.data.version}). Versions must not go backwards in date order.`,
       );
     }
   });
   return entries;
 };
+
+export const getEveryChangelog = async (): Promise<ChangelogEntry[]> =>
+  (await Promise.all(PRODUCTS.map(getChangelog))).flat().sort(byNewest);
 
 export const firstOfVersion = (entries: ChangelogEntry[]): Set<string> => {
   const seen = new Set<string>();
@@ -69,10 +87,10 @@ export const groupByDay = (entries: ChangelogEntry[]): ChangelogDay[] => {
   return [...days.values()];
 };
 
-export const entryPath = (entry: ChangelogEntry): string => `${CHANGELOG.path}/${entry.id}`;
+export const entryPath = (entry: ChangelogEntry): string => `${CHANGELOGS[productOf(entry)].path}/${entry.id}`;
 
-export const pagePath = (page: number): string =>
-  page === 1 ? `${CHANGELOG.path}/` : `${CHANGELOG.path}/page/${page}/`;
+export const pagePath = (product: ChangelogProduct, page: number): string =>
+  page === 1 ? `${CHANGELOGS[product].path}/` : `${CHANGELOGS[product].path}/page/${page}/`;
 
 export const toPages = (entries: ChangelogEntry[]): ChangelogEntry[][] => {
   const pages: ChangelogEntry[][] = [];

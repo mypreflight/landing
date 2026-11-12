@@ -1,5 +1,5 @@
 ---
-import { APP_URL, CHANGELOG, NAV } from "../constants";
+import { APP_URL, CHANGELOG, CHANGELOGS, NAV } from "../constants";
 import Mark from "./Mark.astro";
 
 const iconHigh =
@@ -37,7 +37,7 @@ const onChangelog = Astro.url.pathname.startsWith(CHANGELOG.path);
       ></span>
       <a
         data-dock-item
-        href={CHANGELOG.path}
+        href={CHANGELOGS.app.path}
         aria-current={onChangelog ? "page" : undefined}
         class:list={[
           "flex h-8 items-center rounded-lg px-2.5 text-sm font-semibold whitespace-nowrap transition-colors duration-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500 sm:px-3",

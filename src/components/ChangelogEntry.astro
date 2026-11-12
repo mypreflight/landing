@@ -47,7 +47,7 @@ const hasBody = Boolean(entry.body?.trim());
       </span>
       <time datetime={dayKey(date)} class="tabular-nums">{formatDay(date)}</time>
       <a
-        href={releaseUrl(version)}
+        href={releaseUrl(entry)}
         rel="noopener noreferrer"
         target="_blank"
         class="w-fit underline decoration-gray-300 underline-offset-2 transition-colors duration-200 hover:text-indigo-600 hover:decoration-indigo-400 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500 dark:decoration-gray-600 dark:hover:text-indigo-400"

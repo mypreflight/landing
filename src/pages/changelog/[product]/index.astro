@@ -1,0 +1,57 @@
+---
+import ChangelogLinks from "../../../components/ChangelogLinks.astro";
+import ChangelogList from "../../../components/ChangelogList.astro";
+import ChangelogSwitch from "../../../components/ChangelogSwitch.astro";
+import { CHANGELOG, CHANGELOGS, type ChangelogProduct } from "../../../constants";
+import Layout from "../../../layouts/Layout.astro";
+import {
+  firstOfVersion,
+  getChangelog,
+  PRODUCTS,
+  pagePath,
+  toPages,
+  typeset,
+  versionPages,
+} from "../../../lib/changelog";
+
+export function getStaticPaths() {
+  return PRODUCTS.map((product) => ({ params: { product }, props: { product } }));
+}
+
+interface Props {
+  product: ChangelogProduct;
+}
+
+const { product } = Astro.props;
+const changelog = CHANGELOGS[product];
+const entries = await getChangelog(product);
+const pages = toPages(entries);
+const anchored = firstOfVersion(entries);
+---
+
+<Layout title={changelog.title} description={changelog.description}>
+  <link slot="head" rel="alternate" type="application/atom+xml" href={changelog.feedPath} title={changelog.longTitle} />
+
+  <main class="changelog flex-1 px-6 pt-36 pb-20 sm:pt-44 sm:pb-28">
+    <div class="mx-auto max-w-6xl">
+      <header class="max-w-3xl pb-12 sm:pb-16">
+        <h1 class="text-4xl leading-tight font-bold tracking-tight text-gray-900 sm:text-5xl dark:text-white">
+          {CHANGELOG.heading}<span class="sr-only">, {changelog.name}</span>
+        </h1>
+        <ChangelogSwitch current={product} class="mt-6" />
+        <p class="mt-6 max-w-prose text-lg leading-relaxed text-pretty text-gray-600 dark:text-gray-300">
+          {typeset(changelog.lead)}
+        </p>
+        <ChangelogLinks product={product} class="mt-8" />
+      </header>
+
+      <ChangelogList
+        entries={pages[0] ?? []}
+        page={1}
+        anchored={anchored}
+        next={pages.length > 1 ? pagePath(product, 2) : undefined}
+        versions={versionPages(entries)}
+      />
+    </div>
+  </main>
+</Layout>

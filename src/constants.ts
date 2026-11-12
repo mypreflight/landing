@@ -3,6 +3,7 @@ export const SITE_ORIGIN = "https://mypreflight.io";
 export const APP_URL = "https://app.mypreflight.io";
 export const DISCORD_URL = "https://discord.gg/YVatSsZQyw";
 export const APP_RELEASES_URL = "https://github.com/mypreflight/app/releases/tag";
+export const TRANSPONDER_RELEASES_URL = "https://github.com/mypreflight/transponder-app/releases/tag";
 export const OWNER_NAME = "Oskar Barcz";
 export const OWNER_URL = "https://barcz.me";
 
@@ -199,12 +200,12 @@ export const CHANGELOG = {
   markdownPath: "/changelog.md",
   title: `Changelog, ${SITE_NAME}`,
   description:
-    "Every feature and fix that reaches MyPreflight, newest first, with the screen before and after the change.",
+    "Every feature and fix that reaches the MyPreflight web app and the Transponder, newest first, with the screen before and after the change.",
   heading: "Changelog",
-  lead: "Here's what we've been building, one release at a time. The newest is at the top, and wherever a screen changed, you can flip between how it looked before and after.",
+  switchLabel: "Choose a changelog",
+  movedLabel: "The changelog now lives at",
   feedLabel: "Follow the feed",
   discordLabel: "Release posts on Discord",
-  backLabel: "All changes",
   pageSize: 5,
   olderLabel: "Older changes",
   loadingLabel: "Loading older changes...",
@@ -219,8 +220,40 @@ export const CHANGELOG = {
   githubLabel: "See on GitHub",
   beforeLabel: "Before",
   afterLabel: "After",
-  areas: ["Flight tracking", "Maps", "Briefing", "Dashboard", "Transponder", "Account", "Airport data", "App"],
 } as const;
+
+export const CHANGELOGS = {
+  app: {
+    name: "Web app",
+    path: `${CHANGELOG.path}/app`,
+    feedPath: `${CHANGELOG.path}/app/feed.xml`,
+    markdownPath: `${CHANGELOG.path}/app.md`,
+    title: `Web app changelog, ${SITE_NAME}`,
+    longTitle: `${SITE_NAME} web app changelog`,
+    description:
+      "Every feature and fix that reaches the MyPreflight web app, newest first, with the screen before and after the change.",
+    lead: "Here's what we've been building into the web app, one release at a time. The newest is at the top, and wherever a screen changed, you can flip between how it looked before and after.",
+    releasesUrl: APP_RELEASES_URL,
+    versionExample: "2.124.0",
+    areas: ["Flight tracking", "Maps", "Briefing", "Dashboard", "Transponder", "Account", "Airport data", "App"],
+  },
+  transponder: {
+    name: "Transponder",
+    path: `${CHANGELOG.path}/transponder`,
+    feedPath: `${CHANGELOG.path}/transponder/feed.xml`,
+    markdownPath: `${CHANGELOG.path}/transponder.md`,
+    title: `Transponder changelog, ${SITE_NAME}`,
+    longTitle: `${SITE_NAME} Transponder changelog`,
+    description:
+      "Every Transponder release a pilot will notice, newest first, with the console before and after the change.",
+    lead: "The Transponder is the small Windows app that sends your position from the simulator to MyPreflight. Here's every release you'll notice, newest first, and wherever the console changed, you can flip between how it looked before and after.",
+    releasesUrl: TRANSPONDER_RELEASES_URL,
+    versionExample: "1.5.4",
+    areas: ["Tracking", "Dashboard", "GSX", "Account"],
+  },
+} as const;
+
+export type ChangelogProduct = keyof typeof CHANGELOGS;
 
 export const CLOSING_CTA = {
   heading: "We are building it now.",
@@ -246,9 +279,14 @@ export const LLMS = {
           note: "the whole site as plain markdown: what the board does, the four feature areas, how to get started, and the FAQ",
         },
         {
-          label: "MyPreflight changelog",
-          url: `${SITE_ORIGIN}${CHANGELOG.markdownPath}`,
-          note: "every feature and fix that has reached the app and the Transponder, newest first",
+          label: "MyPreflight web app changelog",
+          url: `${SITE_ORIGIN}${CHANGELOGS.app.markdownPath}`,
+          note: "every feature and fix that has reached the web app, newest first",
+        },
+        {
+          label: "MyPreflight Transponder changelog",
+          url: `${SITE_ORIGIN}${CHANGELOGS.transponder.markdownPath}`,
+          note: "every release of the Windows app that sends your position from the simulator, newest first",
         },
       ],
     },
@@ -272,7 +310,7 @@ export const FOOTER = {
       label: "Product",
       links: [
         { label: "Sign in", href: `${APP_URL}/sign-in`, external: true },
-        { label: "Changelog", href: CHANGELOG.path, external: false },
+        { label: "Changelog", href: CHANGELOGS.app.path, external: false },
         { label: "Discord", href: DISCORD_URL, external: true },
       ],
     },

@@ -1,37 +1,24 @@
 ---
-import ChangelogLinks from "../../components/ChangelogLinks.astro";
-import ChangelogList from "../../components/ChangelogList.astro";
-import { CHANGELOG, SITE_NAME } from "../../constants";
-import Layout from "../../layouts/Layout.astro";
-import { firstOfVersion, getChangelog, pagePath, toPages, typeset, versionPages } from "../../lib/changelog";
+import { CHANGELOG, CHANGELOGS } from "../../constants";
+import { pagePath } from "../../lib/changelog";
 
-const entries = await getChangelog();
-const pages = toPages(entries);
-const anchored = firstOfVersion(entries);
+const target = pagePath("app", 1);
 ---
 
-<Layout title={CHANGELOG.title} description={CHANGELOG.description}>
-  <link slot="head" rel="alternate" type="application/atom+xml" href={CHANGELOG.feedPath} title={`${SITE_NAME} changelog`} />
-
-  <main class="changelog flex-1 px-6 pt-36 pb-20 sm:pt-44 sm:pb-28">
-    <div class="mx-auto max-w-6xl">
-      <header class="max-w-3xl pb-12 sm:pb-16">
-        <h1 class="text-4xl leading-tight font-bold tracking-tight text-gray-900 sm:text-5xl dark:text-white">
-          {CHANGELOG.heading}
-        </h1>
-        <p class="mt-5 max-w-prose text-lg leading-relaxed text-pretty text-gray-600 dark:text-gray-300">
-          {typeset(CHANGELOG.lead)}
-        </p>
-        <ChangelogLinks class="mt-8" />
-      </header>
-
-      <ChangelogList
-        entries={pages[0] ?? []}
-        page={1}
-        anchored={anchored}
-        next={pages.length > 1 ? pagePath(2) : undefined}
-        versions={versionPages(entries)}
-      />
-    </div>
-  </main>
-</Layout>
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{CHANGELOG.title}</title>
+    <meta name="robots" content="noindex" />
+    <link rel="canonical" href={new URL(target, Astro.site).href} />
+    <script is:inline define:vars={{ target }}>
+      location.replace(target + location.search + location.hash);
+    </script>
+    <meta http-equiv="refresh" content={`0; url=${target}`} />
+  </head>
+  <body>
+    <p>{CHANGELOG.movedLabel} <a href={target}>{CHANGELOGS.app.title}</a>.</p>
+  </body>
+</html>

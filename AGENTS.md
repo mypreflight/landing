@@ -61,8 +61,10 @@ template markup at all — keep it tidy by hand.
 
 - Push to `main` runs `.github/workflows/deploy.yml`: build, deploy to GitHub Pages, then tag the
   commit with `package.json`'s `version` and create a GitHub release.
-- **Bump `package.json` `version` whenever a PR should produce a new release tag.**
-  `.github/bin/check_version_is_free` fails the PR check when the version is already tagged.
+- Once that deploy succeeds, `.github/workflows/announce.yml` posts any new Discord announcement
+  (see "Discord announcements" below).
+- **Bump `package.json` `version` whenever a PR should produce a new release tag.** The "Check app
+  version is unique" step in `integrate.yml` fails the PR check when the version is already tagged.
 - There is deliberately no `public/CNAME`: `mypreflight.io` is still the verified Pages domain of
   `flight-tracker-app`. See README "Deployment" before touching domains.
 - Use the newest major version of every GitHub Action.
@@ -330,6 +332,55 @@ colour, faint at half intensity), 88 columns, 14 px by 16 px of padding, on a pa
 background, captured at device scale 2. Before and after share one row count. Use the seeded pilot,
 AAL4908 (checked in, Boston to Philadelphia) or AAL4912 (in cruise), and the API and ADS-B receiver
 versions that were live at the time. The console has one theme, so these shots have `light` only.
+
+## Discord announcements
+
+The update posts in the MyPreflight Discord's releases channel come from this repo. Each is a folder
+in `discord/` named `YYYY-MM-DD-<slug>` after the day it's written, holding `post.md` and up to ten
+images named `01-<what-it-shows>.png`, `02-...`, posted in that order. `discord/` sits outside `src/`
+on purpose: nothing in it reaches the website.
+
+```markdown
+---
+changelog: app
+version: "2.132.0"
+---
+
+**MyPreflight 2.132.0: your briefing, one phase at a time**
+
+The Briefing view's ten tabs are now three phases: ...
+```
+
+`changelog` is `app` or `transponder`, and `version` must match an entry in that changelog. The body
+is the message exactly as Discord shows it, in Discord's markdown. Don't write the changelog link:
+the script appends `Full changelog: https://mypreflight.io/changelog/<changelog>/?version=<version>`,
+and the whole message, link included, must fit Discord's 2,000 characters. Every post goes out with
+embeds suppressed, so links show no preview card while the attached images still do, and it pings
+nobody.
+
+A post covers what a pilot can now do, not one changelog entry: one release can be one post with
+several slides, and small fixes get none. It goes in the landing PR of the last changelog entry it
+covers. The images are the 1920x1080 slides from the app repo's `app-screenshots` skill, at scale 1.
+
+**Merging is publishing.** `scripts/discord.mjs` does both halves:
+
+- `npm run discord:check` (the `discord` job in `integrate.yml`) checks every folder and writes the
+  message that will go out to the job summary. Read it there before you merge.
+- After a successful deploy of `main`, `announce.yml` runs `node scripts/discord.mjs post`. It first
+  asks Discord for the webhook's details, so a wrong or missing secret fails the run even when there
+  is nothing to post. Then, for each
+  folder without a `discord/<folder>` tag, oldest first, it checks that the product's GitHub release
+  for `version` exists, pushes the tag, then posts the text and images through the webhook in the
+  `DISCORD_RELEASES_WEBHOOK_URL` secret. If Discord refuses the post, it deletes the tag again and the
+  job fails. A missing release fails the job too and leaves the folder for the next run.
+
+The tags are the record of what was posted, so a re-run, a cancelled deploy or a later push never
+posts twice. Editing a posted folder changes nothing in Discord, and the check fails if you try; fix
+the message in Discord by hand. To post one again, delete its tag
+(`git push origin :refs/tags/discord/<folder>`) and run `announce` from the Actions tab.
+
+The secret lives in the `discord` environment, which only `main` can use, so no PR run can read it.
+The webhook's name and avatar are set in Discord, not here.
 
 ## Code style
 

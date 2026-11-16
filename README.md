@@ -66,6 +66,10 @@ and correct.
 
 `APP_URL` in `src/constants.ts` points at `https://app.mypreflight.io`, which is the app.
 
+After each deploy, `announce.yml` posts new announcements from `discord/` to the Discord releases
+channel through the webhook in the `DISCORD_RELEASES_WEBHOOK_URL` secret of the `discord`
+environment, which only `main` can use. AGENTS.md, "Discord announcements", has the details.
+
 GitHub Pages serves every asset with `Cache-Control: max-age=600` and does not allow custom
 headers. That is the one cost of self-hosting the font (see "Fonts"): repeat visitors revalidate it
 every ten minutes, though the response is a 304 on an already-open connection and `font-display:

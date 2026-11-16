@@ -6,6 +6,10 @@ import { setTimeout as sleep } from "node:timers/promises";
 const ROOT = "discord";
 const SITE = "https://mypreflight.io";
 const RELEASE_REPOS = { app: "mypreflight/app", transponder: "mypreflight/transponder-app" };
+const SEE_IT = {
+  app: { name: "MyPreflight", url: "https://app.mypreflight.io" },
+  transponder: { name: "MyPreflight Transponder", url: `${SITE}/transponder` },
+};
 const MAX_CONTENT = 2000;
 const MAX_IMAGES = 10;
 const MAX_IMAGE_BYTES = 10 * 1024 * 1024;
@@ -79,11 +83,16 @@ const load = (folder) => {
   }
   if (!parsed.body) errors.push("The post has no text.");
   if (parsed.body.includes("—")) errors.push("No em dashes: use a colon, a comma or a full stop.");
+  const heading = parsed.body.split("\n")[0];
+  if (!/^\*\*[^*].*\*\*$/.test(heading))
+    errors.push("Start with a bold heading line: **Vertical profile is now zoomable!**");
+  if (/\d+\.\d+\.\d+/.test(heading)) errors.push("Leave the version out of the heading; the closing line names it.");
 
   const link = `${SITE}/changelog/${changelog}/?version=${version}`;
-  const content = `${parsed.body}\n\nFull changelog: ${link}`;
+  const see = SEE_IT[changelog] ?? SEE_IT.app;
+  const content = `${parsed.body}\n\nChanges were introduced in [v${version}](${link}), see it in action on [${see.name}](${see.url})!`;
   if (content.length > MAX_CONTENT) {
-    errors.push(`The post is ${content.length} characters with the changelog link; Discord allows ${MAX_CONTENT}.`);
+    errors.push(`The post is ${content.length} characters with the closing line; Discord allows ${MAX_CONTENT}.`);
   }
 
   const images = [];

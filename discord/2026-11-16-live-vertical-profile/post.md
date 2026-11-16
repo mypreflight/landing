@@ -3,7 +3,7 @@ changelog: app
 version: "2.133.0"
 ---
 
-**MyPreflight 2.133.0: your vertical profile, live and zoomable**
+**Vertical profile is now live, clickable and zoomable!**
 
 The vertical profile now sits under the map on the Tracking view, so you can watch the climb, cruise and descent build against the plan while you fly.
 

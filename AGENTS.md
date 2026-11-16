@@ -346,15 +346,18 @@ changelog: app
 version: "2.132.0"
 ---
 
-**MyPreflight 2.132.0: your briefing, one phase at a time**
+**Vertical profile is now live, clickable and zoomable!**
 
-The Briefing view's ten tabs are now three phases: ...
+The vertical profile now sits under the map on the Tracking view, ...
 ```
 
 `changelog` is `app` or `transponder`, and `version` must match an entry in that changelog. The body
-is the message exactly as Discord shows it, in Discord's markdown. Don't write the changelog link:
-the script appends `Full changelog: https://mypreflight.io/changelog/<changelog>/?version=<version>`,
-and the whole message, link included, must fit Discord's 2,000 characters. Every post goes out with
+is the message exactly as Discord shows it, in Discord's markdown: a short bold heading saying what
+pilots get, without the version, then a short description. Don't write the closing line: the script
+appends `Changes were introduced in [v<version>](https://mypreflight.io/changelog/<changelog>/?version=<version>), see it in action on [MyPreflight](https://app.mypreflight.io)!`
+(a Transponder post points at the Transponder page instead), and the whole message, closing line
+included, must fit Discord's 2,000 characters. The check fails on a heading that isn't bold or
+names a version. Every post goes out with
 embeds suppressed, so links show no preview card while the attached images still do, and it pings
 nobody.
 

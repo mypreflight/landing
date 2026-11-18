@@ -1,6 +1,6 @@
 ---
 title: "Confirm the aircraft an import added to the fleet"
-date: 2026-11-18T12:00:00Z
+date: 2026-11-18T11:03:15Z
 version: "2.137.0"
 area: "App"
 summary: "A SimBrief plan whose registration isn't in the fleet adds the aircraft with SimBrief's type, marked Unconfirmed in the fleet table and on its page. Operations check the registration and type, then choose Confirm correctness."

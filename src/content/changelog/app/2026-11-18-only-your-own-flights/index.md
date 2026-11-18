@@ -1,6 +1,6 @@
 ---
 title: "Your dashboard shows only your own flights"
-date: 2026-11-18T12:02:00Z
+date: 2026-11-18T11:15:50Z
 version: "2.139.0"
 area: "Dashboard"
 summary: "Recent flights, Flight history and Next scheduled flight now show only your own flights. A new pilot adds a SimBrief ID right on the dashboard and goes straight on to the import, and the import window lays the plan out as airports, block times and your aircraft."

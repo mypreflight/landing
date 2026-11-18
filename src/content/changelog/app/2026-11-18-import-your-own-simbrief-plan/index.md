@@ -1,6 +1,6 @@
 ---
 title: "Import your own SimBrief plan and fly it straight away"
-date: 2026-11-18T12:01:00Z
+date: 2026-11-18T11:13:55Z
 version: "2.138.0"
 area: "Dashboard"
 summary: "Import from SimBrief on the dashboard shows your latest SimBrief plan and checks you in with its estimated times, so a flight no longer waits for Operations to import and release it."
